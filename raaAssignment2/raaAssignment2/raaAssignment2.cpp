@@ -207,7 +207,7 @@ public:
 					raaCarFacarde* pCar = dynamic_cast<raaCarFacarde*>(facarde);
 					pCar->toggleStatus();
 
-					// to be fixed
+					// cameraChange (bug)
 					//osg::ref_ptr<osg::MatrixTransform> cameraTransform = createCameraView(viewer, osg::Vec3d(192.062, 892.065, 195.52), osg::Vec3d(0.0, 0.0, 0.0));
 					//osg::ref_ptr<osg::MatrixTransform> carTransform = new osg::MatrixTransform();
 					//carTransform->addChild(pCar->root());
