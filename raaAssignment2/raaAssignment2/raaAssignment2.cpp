@@ -1,4 +1,4 @@
-#include <windows.h>
+﻿#include <windows.h>
 #include <iostream>
 #include <math.h>
 #include <osgWidget/ViewerEventHandlers>
@@ -33,6 +33,7 @@
 #include "TrafficLightControl.h"
 #include "TrafficLightFacarde.h"
 #include "raaBoundCalculator.h"
+#include "PickingHandler.h"
 
 // -*-c++-*- osgWidget - Code by: Jeremy Moles (cubicool) 2007-2008
 // $Id: osgwidgetmenu.cpp 66 2008-07-14 21:54:09Z cubicool $
@@ -156,7 +157,7 @@ public:
 private:
 	osg::Camera* m_camera;
 };
-  
+
 #define M_PI       3.14159265358979323846   // pi
 #define M_1_PI     0.318309886183790671538  // 1/pi
 
@@ -312,28 +313,28 @@ void addLightsTile(std::string sAssetName, std::string sPartName, int xUnit, int
 			TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
 			pFacarde->addTrafficLight(rightLight);
 			trafficLights->addChild(rightLight->root());
-			
+
 		}
 	}
 
 	if (sPartName == "tile1" || sPartName == "tile10") {
-			// Create right light
-			lights++;
-			name = "trafficLight" + std::to_string(lights);
-			TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
-			pFacarde->addTrafficLight(rightLight);
-			trafficLights->addChild(rightLight->root());
-		
+		// Create right light
+		lights++;
+		name = "trafficLight" + std::to_string(lights);
+		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
+		pFacarde->addTrafficLight(rightLight);
+		trafficLights->addChild(rightLight->root());
+
 	}
 
 	if (sPartName == "tile12" || sPartName == "tile15" || sPartName == "tile7" || sPartName == "tile18") {
 		// Create left light
 		lights++;
 		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* leftLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians) * (g_fTileSize / 2) + g_fTileSize  )* pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians) * (g_fTileSize / 2)) * pavementRatio - 285.0f , 0.0f), fRot - 90.0f, 0.08f);
+		TrafficLightFacarde* leftLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians) * (g_fTileSize / 2) + g_fTileSize) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians) * (g_fTileSize / 2)) * pavementRatio - 285.0f, 0.0f), fRot - 90.0f, 0.08f);
 		// Add lights to controller
 		pFacarde->addTrafficLight(leftLight);
-		
+
 		// Add to trafficLights OSG::Group
 		trafficLights->addChild(leftLight->root());
 
@@ -341,13 +342,13 @@ void addLightsTile(std::string sAssetName, std::string sPartName, int xUnit, int
 		// Create right light
 		lights++;
 		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) ) * pavementRatio , g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) )* pavementRatio + 225.0f , 0.0f), 0.0f, 0.08f);
+		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio + 225.0f, 0.0f), 0.0f, 0.08f);
 		pFacarde->addTrafficLight(rightLight);
 		trafficLights->addChild(rightLight->root());
 	}
 
-	if (sPartName == "tile3" || sPartName == "tile8" ) {
-		
+	if (sPartName == "tile3" || sPartName == "tile8") {
+
 		if (sPartName == "tile8") {
 			// Create left light
 			lights++;
@@ -372,19 +373,19 @@ void addLightsTile(std::string sAssetName, std::string sPartName, int xUnit, int
 	}
 
 	if (sPartName == "tile21") {
-		
-			lights++;
-			name = "trafficLight" + std::to_string(lights);
-			TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
-			pFacarde->addTrafficLight(rightLight);
-			trafficLights->addChild(rightLight->root());
+
+		lights++;
+		name = "trafficLight" + std::to_string(lights);
+		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
+		pFacarde->addTrafficLight(rightLight);
+		trafficLights->addChild(rightLight->root());
 
 	}
 	if (sPartName == "tile26") {
 		// Create left light
 		lights++;
 		name = "trafficLight" + std::to_string(lights);
-	    TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio + 225.0f, 0.0f), 0.0f, 0.08f);
+		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio + 225.0f, 0.0f), 0.0f, 0.08f);
 		pFacarde->addTrafficLight(rightLight);
 		trafficLights->addChild(rightLight->root());
 	}
@@ -395,20 +396,37 @@ osg::Node* buildAnimatedVehicleAsset()
 {
 	osg::Group* pGroup = new osg::Group();
 
-	osg::Geode* pGB = new osg::Geode();
-	osg::ShapeDrawable* pGeomB = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), 100.0f, 60.0f, 40.0f));
-	osg::Material* pMat = new osg::Material();
-	pMat->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.3f, 0.3f, 0.1f, 1.0f));
-	pMat->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(0.8f, 0.8f, 0.3f, 1.0f));
-	pMat->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(1.0f, 1.0f, 0.6f, 1.0f));
+	osg::MatrixTransform* pCarL = new osg::MatrixTransform();
+	osg::Node* pCarN = osgDB::readNodeFile("../models/car-veyron.OSGB");
 
-	pGroup->addChild(pGB);
-	pGB->addDrawable(pGeomB);
+	raaBoundCalculator* bound = new raaBoundCalculator(pCarN);
 
-	pGB->getOrCreateStateSet()->setAttribute(pMat, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
-	pGB->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE), osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
+	pCarL->preMult(osg::Matrix::scale(10.0f, 10.0f, 10.0f));
+
+	pCarL->preMult(osg::Matrix::rotate(osg::PI_2, osg::Vec3(0.0f, 0.0f, 1.0f)));
+
+	pCarL->postMult(osg::Matrix::translate(osg::Vec3(0.0f, 0.0f, 30.0f)));
+
+	pCarL->addChild(pCarN);
+
+	pGroup->addChild(pCarL);
 
 	return pGroup;
+
+	//osg::Geode* pGB = new osg::Geode();
+	//osg::ShapeDrawable* pGeomB = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), 100.0f, 60.0f, 40.0f));
+	//osg::Material* pMat = new osg::Material();
+	//pMat->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.3f, 0.3f, 0.1f, 1.0f));
+	//pMat->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(0.8f, 0.8f, 0.3f, 1.0f));
+	//pMat->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(1.0f, 1.0f, 0.6f, 1.0f));
+
+	//pGroup->addChild(pGB);
+	//pGB->addDrawable(pGeomB);
+
+	//pGB->getOrCreateStateSet()->setAttribute(pMat, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
+	//pGB->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE), osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
+
+	//return pGroup;
 }
 
 osg::AnimationPath* createAnimationPath(raaAnimationPointFinders apfs, osg::Group* pRoadGroup)
@@ -445,7 +463,7 @@ void buildRoad(osg::Group* pRoadGroup)
 {
 	addRoadTile("roadTJunction", "tile0", 0, 0, -90.0f, pRoadGroup);
 	addRoadTile("roadStraight", "tile1", -1, 0, 0.0f, pRoadGroup);
-	addRoadTile("roadCurve", "tile2", -2, 0, 0.0f, pRoadGroup);	
+	addRoadTile("roadCurve", "tile2", -2, 0, 0.0f, pRoadGroup);
 	addRoadTile("roadStraight", "tile3", -2, 1, -90.0f, pRoadGroup);
 	addRoadTile("roadTJunction", "tile4", -2, 2, -180.0f, pRoadGroup);
 	addRoadTile("roadStraight", "tile5", -1, 2, 0.0f, pRoadGroup);
@@ -483,11 +501,11 @@ void createCarOne(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 
 	apfs.push_back(raaAnimationPointFinder("tile1", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile1", 3, pRoadGroup));
-	
+
 	apfs.push_back(raaAnimationPointFinder("tile2", 3, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile2", 4, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile2", 5, pRoadGroup));
-	
+
 	apfs.push_back(raaAnimationPointFinder("tile3", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile3", 3, pRoadGroup));
 
@@ -501,7 +519,7 @@ void createCarOne(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 	apfs.push_back(raaAnimationPointFinder("tile6", 0, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile6", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile6", 2, pRoadGroup));
-	
+
 	apfs.push_back(raaAnimationPointFinder("tile12", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile12", 3, pRoadGroup));
 
@@ -538,7 +556,7 @@ void createCarOne(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 
 
 	ap = createAnimationPath(apfs, pRoadGroup);
-	
+
 	// NOTE: you will need to extend or develop the car facarde to manage the animmation speed and events
 	raaCarFacarde* pCar = new raaCarFacarde(g_pRoot, raaAssetLibrary::getNamedAsset("vehicle", "car1"), ap, 30.0);
 	pCarGroup->addChild(pCar->root());
@@ -614,14 +632,14 @@ void createCarThree(osg::Group* pRoadGroup, osg::Group* pCarGroup) {
 	osg::AnimationPath* ap = new osg::AnimationPath();
 
 	apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
-	
+
 	apfs.push_back(raaAnimationPointFinder("tile26", 3, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile26", 3, pRoadGroup));
-	
+
 	apfs.push_back(raaAnimationPointFinder("tile28", 0, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile28", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile28", 2, pRoadGroup));
-	
+
 	apfs.push_back(raaAnimationPointFinder("tile27", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile27", 3, pRoadGroup));
 
@@ -660,7 +678,7 @@ void createCarThree(osg::Group* pRoadGroup, osg::Group* pCarGroup) {
 	apfs.push_back(raaAnimationPointFinder("tile21", 0, pRoadGroup));
 
 	apfs.push_back(raaAnimationPointFinder("tile22", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile22", 1, pRoadGroup));	
+	apfs.push_back(raaAnimationPointFinder("tile22", 1, pRoadGroup));
 	apfs.push_back(raaAnimationPointFinder("tile22", 2, pRoadGroup));
 
 	apfs.push_back(raaAnimationPointFinder("tile23", 1, pRoadGroup));
@@ -669,7 +687,7 @@ void createCarThree(osg::Group* pRoadGroup, osg::Group* pCarGroup) {
 	apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
 
 
-	
+
 
 	ap = createAnimationPath(apfs, pRoadGroup);
 
@@ -678,8 +696,8 @@ void createCarThree(osg::Group* pRoadGroup, osg::Group* pCarGroup) {
 }
 
 void createTrafficLights(osg::Group* pRoadGroup, osg::Group* pTrafficLightGroup)
-{	
-	
+{
+
 	addLightsTile("roadStraight", "tile20", 1, 0, 0.0f, pRoadGroup, pTrafficLightGroup);
 	addLightsTile("roadStraight", "tile17", 1, 2, 0.0f, pRoadGroup, pTrafficLightGroup);
 	addLightsTile("roadStraight", "tile13", 1, 4, 0.0f, pRoadGroup, pTrafficLightGroup);
@@ -991,7 +1009,7 @@ osg::ref_ptr<osg::Geode> createText(const std::string& text, const osg::Vec4& co
 //}
 
 // class to click on 3D nodes (bugs)
-class PickingHandler : public osgGA::GUIEventHandler {
+class PickingHandler2 : public osgGA::GUIEventHandler {
 public:
 	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 	{
@@ -1014,12 +1032,36 @@ public:
 				osg::NodePath nodePath = intersection.nodePath;
 
 				// Print the node name
-				std::string nodeName = nodePath.back()->getName();
-				std::cout << "Clicked on node: " << nodeName << std::endl;
+				for (int i = 0; i < nodePath.size(); ++i)
+				{
+					raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(nodePath[i]->getUpdateCallback());
+					if (!pCarFacarde || !pCarFacarde->root())
+						continue;
+
+					std::string nodeName = nodePath[i + 1]->getName();
+					std::cout << "Clicked on node: " << nodeName << std::endl;
+					if (nodeName.compare("car1") == 0)
+					{
+						mTrackCar = pCarFacarde;
+						mCameraChange = true;
+					}
+					else if (nodeName.compare("car2") == 0)
+					{
+
+					}
+					else if (nodeName.compare("car3") == 0)
+					{
+
+					}
+				}
 			}
 		}
 		return false;
 	}
+
+protected:
+	raaCarFacarde* mTrackCar = nullptr;
+	bool mCameraChange = false;
 };
 
 int main(int argc, char** argv)
@@ -1045,17 +1087,17 @@ int main(int argc, char** argv)
 	osg::MatrixTransform* g_pWall = createEnvironmentStructure();
 	g_pRoot->addChild(g_pWall);
 
-	 osg::MatrixTransform* g_pWalking = createAnimatedModel();
-	 g_pRoot->addChild(g_pWalking);
+	osg::MatrixTransform* g_pWalking = createAnimatedModel();
+	g_pRoot->addChild(g_pWalking);
 
-	 osg::Geode* text = createText("Use \"q\" to control the TrafficLight14\nUse \"w\" to control the TrafficLight15", osg::Vec4(1.0, 1.0, 1.0, 1.0), 100, 100);
-	 // g_pRoot->addChild(text);
+	osg::Geode* text = createText("Use \"q\" to control the TrafficLight14\nUse \"w\" to control the TrafficLight15", osg::Vec4(1.0, 1.0, 1.0, 1.0), 100, 100);
+	// g_pRoot->addChild(text);
 
-	 // Create and add the model to the root node
-	 // osg::Node* boy = loadModel("../models/boy.obj");
-	 // g_pRoot->addChild(boy);
+	// Create and add the model to the root node
+	// osg::Node* boy = loadModel("../models/boy.obj");
+	// g_pRoot->addChild(boy);
 
-	// build asset library - instances or clones of parts can be created from this
+   // build asset library - instances or clones of parts can be created from this
 	raaAssetLibrary::loadAsset("roadStraight", g_sDataPath + "roadStraight.osgb");
 	raaAssetLibrary::loadAsset("roadCurve", g_sDataPath + "roadCurve.osgb");
 	raaAssetLibrary::loadAsset("roadTJunction", g_sDataPath + "roadTJunction.osgb");
@@ -1077,7 +1119,7 @@ int main(int argc, char** argv)
 	menu->addWidget(new CarControlButton("car1"));
 	menu->addWidget(new CarControlButton("car2"));
 	menu->addWidget(new CarControlButton("car3"));
-	
+
 	wm->addChild(menu);
 
 	menu->getBackground()->setColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -1112,9 +1154,9 @@ int main(int argc, char** argv)
 	// Add car two
 	createCarTwo(pRoadGroup, pCarGroup);
 
-	//// Add car three
+	// Add car three
 	createCarThree(pRoadGroup, pCarGroup);
-	
+
 	// osg setup stuff
 	osg::GraphicsContext::Traits* pTraits = new osg::GraphicsContext::Traits();
 	pTraits->x = 20;
@@ -1164,7 +1206,7 @@ int main(int argc, char** argv)
 	viewer.addEventHandler(new osgViewer::ScreenCaptureHandler);
 
 	// add the clicking on 3D nodes
-	// viewer.addEventHandler(new PickingHandler);
+	viewer.addEventHandler(new PickingHandler);
 
 	// set the scene to render
 	//viewer.setSceneData(g_pRoot);
@@ -1173,7 +1215,6 @@ int main(int argc, char** argv)
 	//return osgWidget::createExample(viewer, wm, g_pRoot);
 
 	//return viewer.run();
-	
 
 //	osg::ref_ptr<osg::Node> model = osgDB::readRefNodeFile("../../Data/osgcool.osgt");
 	osg::ref_ptr<osg::Node> model = dynamic_cast<osg::Node*>(g_pRoot);

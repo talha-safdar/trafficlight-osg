@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <windows.h>
 #include <osg/switch>
@@ -9,7 +9,7 @@
 
 // a facarde for the cars in the scene - note this also inherets from collision target to provide support for collision management
 
-class raaCarFacarde: public raaAnimatedFacarde, public raaCollisionTarget
+class raaCarFacarde : public raaAnimatedFacarde, public raaCollisionTarget
 {
 public:
 	raaCarFacarde(osg::Node* pWorldRoot, osg::Node* pPart, osg::AnimationPath* ap, double dSpeed);
@@ -28,6 +28,8 @@ public:
 	void toggleStatus();
 	void speedUp();
 	void speedDown();
+	void setSpeed(double dSpeed);
+	double getSpeed();
 	double curSpeed;
 	int status;
 	bool isCollision;

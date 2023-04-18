@@ -1,4 +1,4 @@
-#include <windows.h>
+﻿#include <windows.h>
 #include <osg/Group>
 #include <osg/Geometry>
 #include <osg/Geode>
@@ -23,7 +23,7 @@
 #define STOP	5
 
 
-raaCarFacarde::raaCarFacarde(osg::Node* pWorldRoot, osg::Node* pPart, osg::AnimationPath* ap, double dSpeed): raaAnimatedFacarde(pPart, ap, dSpeed)
+raaCarFacarde::raaCarFacarde(osg::Node* pWorldRoot, osg::Node* pPart, osg::AnimationPath* ap, double dSpeed) : raaAnimatedFacarde(pPart, ap, dSpeed)
 {
 	raaTrafficSystem::addTarget(this); // adds the car to the traffic system (static class) which holds a reord of all the dynamic parts in the system
 	this->dSpeed = dSpeed;
@@ -31,7 +31,7 @@ raaCarFacarde::raaCarFacarde(osg::Node* pWorldRoot, osg::Node* pPart, osg::Anima
 	this->timeCount = 0;
 	this->flag = FALSE;
 	this->preDistance = 0.0f;
-	this->status =	FAST;
+	this->status = FAST;
 	this->isCollision = FALSE;
 	this->isCurve = FALSE;
 }
@@ -53,6 +53,16 @@ void raaCarFacarde::speedDown()
 		setCurrentSpeed(this->curSpeed);
 		//this->status = STOP;
 	}
+}
+
+void raaCarFacarde::setSpeed(double dSpeed)
+{
+	this->dSpeed = dSpeed;
+}
+
+double raaCarFacarde::getSpeed()
+{
+	return this->dSpeed;
 }
 
 // speed up car
@@ -110,7 +120,7 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 			}
 		}
 		else if (name == "trafficLight6") {
-			if (dy < 0 && dy > -150 && dx>0 && dx < 170) {
+			if (dy < 0 && dy > -150 && dx > 0 && dx < 170) {
 				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
 				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
 				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
@@ -119,7 +129,7 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 			}
 		}
 		else if (name == "trafficLight9") {
-			if (dx < 0 && dx > -170 && dy>0 && dy < 150) {
+			if (dx < 0 && dx > -170 && dy > 0 && dy < 150) {
 				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
 				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
 				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
@@ -247,8 +257,8 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 			else if (distance >= 200 && distance < 400 && (abs(dx) == distance || abs(dy) == distance))
 			{
 				this->status = SPEEDUP; break;
-			}	
-	
+			}
+
 		}
 	}
 
