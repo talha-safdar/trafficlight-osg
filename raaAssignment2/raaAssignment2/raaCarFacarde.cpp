@@ -84,181 +84,60 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 {
 
 	osg::Vec3 worldCollisionPoint = getWorldCollisionPoint();
-	//osg::Vec3 worldDetectionPoint = getWorldDetectionPoint();
-	//std::cout << this->pPart->getName() << ": " << worldCollisionPoint[0] + 800 << ',' << worldCollisionPoint[1] - 530 << std::endl;
-	float carX, carY;
-	carX = worldCollisionPoint[0] + 800;
-	carY = worldCollisionPoint[1] - 530;
-	//std::cout << this->pPart->getName() << ": " << carX << ',' << carY << std::endl;
-	bool red_status = FALSE, exit_flag = false;
-	for (raaFacarde* facarde : sm_lFacardes) {
-		// Get name
-		std::string name = facarde->pPart->getName();
-		if (name.find("traffic") == std::string::npos && name.find("car") == std::string::npos) continue;
-		raaBoundCalculator* facardeBounds = new raaBoundCalculator(facarde->pPart);
-		osg::Vec3 facardePos;
-		facardePos = (facardeBounds->centre()) * facarde->translation()->getWorldMatrices()[0];
+	osg::Vec3 worldDetectionPoint = getWorldDetectionPoint();
+	osg::Vec3 carDirection = worldDetectionPoint - worldCollisionPoint;
+	carDirection.normalize();
+	status = SPEEDUP;
+	for (raaFacarde* facarde : sm_lFacardes)
+	{
+		if (facarde == this)
+			continue;
 
-		// Calculate distance between car and facarde
-		if (name.find("car") != std::string::npos) {
-			facardePos[0] = facardePos[0] + 800;
-			facardePos[1] = facardePos[1] - 530;
-		}
+		if (TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde))
+		{
+			osg::Vec3 lightDetectionPoint = pTrafficLight->getWorldDetectionPoint();
+			osg::Vec3 lightCollisionPoint = pTrafficLight->getWorldCollisionPoint();
+			osg::Vec3 lightDirection = lightCollisionPoint - lightDetectionPoint;
+			lightDirection.normalize();
 
-		float dx = facardePos[0] - carX;
-		float dy = facardePos[1] - carY;
-		float distance = sqrt((dx * dx) + (dy * dy));
-		// Get position of facarde
-		//std::cout << name << ": " << facardePos[0] << ", " << facardePos[1] << std::endl;
-		if (name == "trafficLight5") {
-			if (dx > 0 && dx < 150 && dy>0 && dy < 190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight6") {
-			if (dy < 0 && dy > -150 && dx > 0 && dx < 170) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight9") {
-			if (dx < 0 && dx > -170 && dy > 0 && dy < 150) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight2") {
-			if (dx < 0 && dx > -200 && dy < 0 && dy > -190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight4") {
-			if (dx < 0 && dx > -200 && dy < 0 && dy > -190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight12") {
-			if (dx < 0 && dx > -190 && dy > 0 && dy < 150) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight13") {
-			if (dy < 0 && dy > -150 && dx > 0 && dx < 170) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight7") {
-			if (dx < 0 && dx > -170 && dy > 0 && dy < 150) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight3") {
-			if (dx < 0 && dx > -250 && dy < 0 && dy > -190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight11") {
-			if (dx > 0 && dx < 150 && dy>0 && dy < 190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight10") {
-			if (dx > 0 && dx < 150 && dy>0 && dy < 190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight8") {
-			if (dy < 0 && dy > -150 && dx > 0 && dx < 170) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight1") {
-			if (dx > 0 && dx < 150 && dy>0 && dy < 190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight14") {
-			if (dx > 0 && dx < 100 && dy>0 && dy < 190) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (name == "trafficLight15") {
-			if (dx < 0 && dx > -170 && dy > 0 && dy < 150) {
-				TrafficLightFacarde* trafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
-				int trafficLightStatus = trafficLight->m_iTrafficLightStatus;
-				if (trafficLightStatus == 1 || trafficLightStatus == 2) this->status = SPEEDDOWN, red_status = TRUE;
-				else this->status = SPEEDUP;
-				break;
-			}
-		}
-		else if (pPart->getName() != name && name.find("car") != std::string::npos) {
-			//std::cout << distance << std::endl;
-			//std::cout << name << ":: " << facardePos[0] << ", " << facardePos[1] << std::endl;
-			//std::cout << name << ": " << dx << ", " << dy << std::endl;
-			if ((distance > 0 && distance < 200 && (abs(dx) == distance || abs(dy) == distance))) {
-				this->status = SPEEDDOWN;
-				//	std::cout << " collision" << std::endl;
-				break;
-			}
-			else if (distance >= 200 && distance < 400 && (abs(dx) == distance || abs(dy) == distance))
+			// Determine whether the traffic light and direction are consistent with the direction of the vehicle
+			if (!isSameDirection(carDirection, lightDirection))
+				continue;
+
+			// Detect the distance between the vehicle and the traffic light, 
+			// if it is less than 130, set the speed according to the color of the traffic light
+			float distance = (worldDetectionPoint - lightCollisionPoint).length();
+			if (distance < 130)
 			{
-				this->status = SPEEDUP; break;
+				// Stop at red light
+				if (pTrafficLight->m_iTrafficLightStatus == 1)
+				{
+					status = STOP;
+				}
+				// slow down at yellow light
+				else if (pTrafficLight->m_iTrafficLightStatus == 2)
+				{
+					status = SPEEDDOWN;
+				}
+				// speed up at green light
+				else if (pTrafficLight->m_iTrafficLightStatus == 3)
+				{
+					status = SPEEDUP;
+				}
+				break;
 			}
+		}
 
+		if (raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(facarde))
+		{
+			// Calculate the distance between two vehicles, if less than 50, the vehicle stops running
+			osg::Vec3 vPoint = pCarFacarde->getWorldCollisionPoint();
+			float distance = (worldDetectionPoint - vPoint).length();
+			if (distance < 100)
+			{
+				status = STOP;
+				break;
+			}
 		}
 	}
 
@@ -273,21 +152,21 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
 osg::Vec3f raaCarFacarde::getWorldDetectionPoint()
 {
-	raaBoundCalculator* bounds = new raaBoundCalculator(pPart);
-	//return bounds->centre() * pPart->getWorldMatrices()[0];
-	return (bounds->centre() + osg::Vec3(800, -530, 0)) * translation()->getWorldMatrices()[0];
-	//return this->m_pRoot->getBound().center();
+	raaBoundCalculator bounds(pPart);
+	return (bounds.centre() + osg::Vec3(100, 0, 0)) * root()->getWorldMatrices()[0];
 }
 
 osg::Vec3f raaCarFacarde::getWorldCollisionPoint()
 {
-	raaBoundCalculator* bounds = new raaBoundCalculator(pPart);
-	//return bounds->centre() * pPart->getWorldMatrices()[0];
-	//if(pPart->getName() == "car1") return (bounds->centre() + osg::Vec3(-100, -530, 0)) *translation()->getWorldMatrices()[0];
-	//else  
-	return (bounds->centre() + osg::Vec3(0, 0, 0)) * translation()->getWorldMatrices()[0];
+	raaBoundCalculator bounds(pPart);
+	return (bounds.centre() - osg::Vec3(100, 0, 0)) * root()->getWorldMatrices()[0];
 
-	//return this->m_pRoot->getBound().center();
+}
+
+bool raaCarFacarde::isSameDirection(osg::Vec3 v1, osg::Vec3 v2)
+{
+	float epsinon = 0.0001f;
+	return abs(v1.x() - v2.x()) < epsinon && abs(v1.y() - v2.y()) < epsinon && abs(v1.z() - v2.z()) < epsinon;
 }
 
 // by controlling button and key, changes status of cars

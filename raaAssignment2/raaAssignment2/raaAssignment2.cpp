@@ -34,6 +34,8 @@
 #include "TrafficLightFacarde.h"
 #include "raaBoundCalculator.h"
 #include "PickingHandler.h"
+#include "MenuButton.h"
+#include "ButtonCommandSet.h"
 
 // -*-c++-*- osgWidget - Code by: Jeremy Moles (cubicool) 2007-2008
 // $Id: osgwidgetmenu.cpp 66 2008-07-14 21:54:09Z cubicool $
@@ -44,52 +46,13 @@
 #include <osgWidget/Box>
 #include <osgWidget/Label>
 
+
 // For now this is just an example, but osgWidget::Menu will later be it's own Window.
 // I just wanted to get this out there so that people could see it was possible.
 
 const unsigned int MASK_2D = 0xF0000000;
 const unsigned int MASK_3D = 0x0F000000;
-const osg::Vec4 buttonClickedColour = osg::Vec4(0.0f, 0.4f, 0.4f, 0.8f);
 osgViewer::Viewer viewer;
-
-struct ColorLabel : public osgWidget::Label {
-	ColorLabel(const char* label) :
-		osgWidget::Label("", "") {
-		// setFont("../../Data/fonts/Vera.ttf");
-		setFontSize(14);
-		setFontColor(1.0f, 1.0f, 1.0f, 1.0f);
-		setColor(0.3f, 0.3f, 0.3f, 1.0f);
-		addHeight(30.0f);
-		setCanFill(true);
-		setLabel(label);
-		setEventMask(osgWidget::EVENT_MOUSE_PUSH | osgWidget::EVENT_MASK_MOUSE_MOVE);
-	}
-
-	bool mousePush(double, double, const osgWidget::WindowManager*) {
-		std::cout << "O mouse push" << std::endl;
-		return true;
-	}
-
-	bool mouseEnter(double, double, const osgWidget::WindowManager*) {
-		if (getColor() != buttonClickedColour) {
-			setColor(0.6f, 0.6f, 0.6f, 1.0f);
-		}
-		std::cout << "O mouse hover" << std::endl;
-		return true;
-	}
-
-	bool mouseLeave(double, double, const osgWidget::WindowManager*) {
-		setColor(0.3f, 0.3f, 0.3f, 1.0f);
-		std::cout << "O mouse leave" << std::endl;
-		return true;
-	}
-
-	bool mouseRelease(double, double, const osgWidget::WindowManager*) {
-		setColor(0.3f, 0.3f, 0.3f, 1.0f);
-		std::cout << "O mouse release" << std::endl;
-		return true;
-	}
-};
 
 osg::ref_ptr<osg::MatrixTransform> createCameraView(osgViewer::Viewer& viewer, osg::Vec3d position, osg::Vec3d rotation)
 {
@@ -162,6 +125,7 @@ private:
 #define M_1_PI     0.318309886183790671538  // 1/pi
 
 typedef std::vector<raaAnimationPointFinder>raaAnimationPointFinders;
+std::vector<raaAnimationPointFinders> lstAnimPointFinders;
 osg::Group* g_pRoot = 0; // root of the sg
 float g_fTileSize = 472.441f; // width/depth of the standard road tiles
 std::string g_sDataPath = "../../Data/";
@@ -172,94 +136,6 @@ const float FACE_UP = 180.0f;
 const float FACE_RIGHT = 90.0f;
 
 int lights = 0;
-
-class CarControlButton : public ColorLabel {
-
-private:
-	int carID;
-public:
-	CarControlButton(const char* label) : ColorLabel(label) {
-
-		if (!strcmp(label, "car1")) carID = 1;
-		else if (!strcmp(label, "car2")) carID = 2;
-		else if (!strcmp(label, "car3")) carID = 3;
-
-
-		setColor(0.8f, 0.8f, 0.8f, 0.8f);
-	}
-
-	bool mousePush(double, double, const osgWidget::WindowManager*) {
-		// If the button is already orange, set it back to the original color
-		if (getColor() == osg::Vec4(buttonClickedColour)) {
-			std::cout << "original colour" << std::endl;
-			setColor(0.8f, 0.8f, 0.8f, 0.8f); // set color back to original color
-		}
-		// If the button is not orange, set it to orange
-		else {
-			std::cout << "orange colour" << std::endl;
-			setColor(buttonClickedColour); // set color to orange
-		}
-
-		switch (carID) {
-		case 1:
-			for (raaFacarde* facarde : raaFacarde::facardes()) {
-				std::string name = facarde->pPart->getName();
-				if (name == "car1") {
-					raaCarFacarde* pCar = dynamic_cast<raaCarFacarde*>(facarde);
-					pCar->toggleStatus();
-
-					// cameraChange (bug)
-					//osg::ref_ptr<osg::MatrixTransform> cameraTransform = createCameraView(viewer, osg::Vec3d(192.062, 892.065, 195.52), osg::Vec3d(0.0, 0.0, 0.0));
-					//osg::ref_ptr<osg::MatrixTransform> carTransform = new osg::MatrixTransform();
-					//carTransform->addChild(pCar->root());
-					//carTransform->addChild(cameraTransform);
-					//g_pRoot->addChild(carTransform);
-				}
-				// setColor(1.0f, 0.5f, 0.5f, 0.8f); // orange
-				// std::cout << "mouse leave " << getLabel() << std::endl; // print button label
-			}
-			return true;
-		case 2:
-			for (raaFacarde* facarde : raaFacarde::facardes()) {
-				std::string name = facarde->pPart->getName();
-				if (name == "car2") {
-					raaCarFacarde* pCar = dynamic_cast<raaCarFacarde*>(facarde);
-					pCar->toggleStatus();
-				}
-
-			}
-			return true;
-		case 3:
-			for (raaFacarde* facarde : raaFacarde::facardes()) {
-				std::string name = facarde->pPart->getName();
-				if (name == "car3") {
-					raaCarFacarde* pCar = dynamic_cast<raaCarFacarde*>(facarde);
-					pCar->toggleStatus();
-				}
-
-			}
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	//bool mouseRelease(double, double, const osgWidget::WindowManager*) {
-	//	setColor(1.0f, 0.5f, 0.5f, 0.8f); // orange
-	//	std::cout << "mouse release 2" << std::endl;
-	//	return true;
-	//}
-
-	bool mouseLeave(double, double, const osgWidget::WindowManager*) {
-		if (getColor() != buttonClickedColour) {
-			setColor(0.8f, 0.8f, 0.8f, 0.8f);
-		}
-		std::cout << "mouse leave 2" << std::endl;
-		osg::Camera* camera = viewer.getCamera();
-		// viewer.addEventHandler(new CameraEventHandler(camera));
-		return true;
-	}
-};
 
 enum raaRoadTileType
 {
@@ -272,124 +148,6 @@ void addRoadTile(std::string sAssetName, std::string sPartName, int xUnit, int y
 {
 	raaFacarde* pFacarde = new raaRoadTileFacarde(raaAssetLibrary::getNamedAsset(sAssetName, sPartName), osg::Vec3(g_fTileSize * xUnit, g_fTileSize * yUnit, 0.0f), fRot);
 	pParent->addChild(pFacarde->root());
-}
-
-void addLightsTile(std::string sAssetName, std::string sPartName, int xUnit, int yUnit, float fRot, osg::Group* pParent, osg::Group* trafficLights)
-{
-	// Create traffic control
-	std::string name;
-	TrafficLightControl* pFacarde = new TrafficLightControl(raaAssetLibrary::getNamedAsset(sAssetName, sPartName), osg::Vec3(g_fTileSize * xUnit, g_fTileSize * yUnit, 0.0f), fRot, 1.0f);
-	pParent->addChild(pFacarde->root());
-
-	// Dynamically give traffic light names based on the amount in the group
-	int length = trafficLights->getNumChildren();
-
-	float angleInRadians = fRot * (M_PI / 180);
-	float pavementRatio = 0.8f;
-
-	if (sin(fRot) > cos(fRot) && sAssetName != "roadCurve") {
-		angleInRadians += M_PI;
-	}
-
-
-	if (sAssetName == "roadCurve") {
-		angleInRadians += M_PI / 4;
-		pavementRatio = 0.3f;
-	}
-	if (sPartName == "tile20" || sPartName == "tile17" || sPartName == "tile13" || sPartName == "tile5" || sPartName == "tile25") {
-		// Create left light
-		lights++;
-		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* leftLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians) * (g_fTileSize / 2) * pavementRatio - 285.0f, g_fTileSize * yUnit + (cos(angleInRadians) * (g_fTileSize / 2) - g_fTileSize) * pavementRatio, 0.0f), fRot + 90.0f, 0.08f);
-		// Add lights to controller
-		pFacarde->addTrafficLight(leftLight);
-		// Add to trafficLights OSG::Group
-		trafficLights->addChild(leftLight->root());
-
-		if (sPartName == "tile5") {
-			// Create right light
-			lights++;
-			name = "trafficLight" + std::to_string(lights);
-			TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
-			pFacarde->addTrafficLight(rightLight);
-			trafficLights->addChild(rightLight->root());
-
-		}
-	}
-
-	if (sPartName == "tile1" || sPartName == "tile10") {
-		// Create right light
-		lights++;
-		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
-		pFacarde->addTrafficLight(rightLight);
-		trafficLights->addChild(rightLight->root());
-
-	}
-
-	if (sPartName == "tile12" || sPartName == "tile15" || sPartName == "tile7" || sPartName == "tile18") {
-		// Create left light
-		lights++;
-		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* leftLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians) * (g_fTileSize / 2) + g_fTileSize) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians) * (g_fTileSize / 2)) * pavementRatio - 285.0f, 0.0f), fRot - 90.0f, 0.08f);
-		// Add lights to controller
-		pFacarde->addTrafficLight(leftLight);
-
-		// Add to trafficLights OSG::Group
-		trafficLights->addChild(leftLight->root());
-
-
-		// Create right light
-		lights++;
-		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio + 225.0f, 0.0f), 0.0f, 0.08f);
-		pFacarde->addTrafficLight(rightLight);
-		trafficLights->addChild(rightLight->root());
-	}
-
-	if (sPartName == "tile3" || sPartName == "tile8") {
-
-		if (sPartName == "tile8") {
-			// Create left light
-			lights++;
-			name = "trafficLight" + std::to_string(lights);
-			TrafficLightFacarde* leftLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians) * (g_fTileSize / 2) + g_fTileSize) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians) * (g_fTileSize / 2)) * pavementRatio - 285.0f, 0.0f), fRot - 90.0f, 0.08f);
-			// Add lights to controller
-			pFacarde->addTrafficLight(leftLight);
-
-			// Add to trafficLights OSG::Group
-			trafficLights->addChild(leftLight->root());
-
-		}
-
-		if (sPartName == "tile3") {
-			// Create right light
-			lights++;
-			name = "trafficLight" + std::to_string(lights);
-			TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio + 225.0f, 0.0f), 0.0f, 0.08f);
-			pFacarde->addTrafficLight(rightLight);
-			trafficLights->addChild(rightLight->root());
-		}
-	}
-
-	if (sPartName == "tile21") {
-
-		lights++;
-		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + sin(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio + 225.0f, g_fTileSize * yUnit + cos(angleInRadians + M_1_PI) * (g_fTileSize / 2) * pavementRatio, 0.0f), fRot - 90.0f, 0.08f);
-		pFacarde->addTrafficLight(rightLight);
-		trafficLights->addChild(rightLight->root());
-
-	}
-	if (sPartName == "tile26") {
-		// Create left light
-		lights++;
-		name = "trafficLight" + std::to_string(lights);
-		TrafficLightFacarde* rightLight = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", name), osg::Vec3(g_fTileSize * xUnit + (sin(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio, g_fTileSize * yUnit + (cos(angleInRadians + M_1_PI) * (g_fTileSize / 2)) * pavementRatio + 225.0f, 0.0f), 0.0f, 0.08f);
-		pFacarde->addTrafficLight(rightLight);
-		trafficLights->addChild(rightLight->root());
-	}
-
 }
 
 osg::Node* buildAnimatedVehicleAsset()
@@ -412,23 +170,7 @@ osg::Node* buildAnimatedVehicleAsset()
 	pGroup->addChild(pCarL);
 
 	return pGroup;
-
-	//osg::Geode* pGB = new osg::Geode();
-	//osg::ShapeDrawable* pGeomB = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), 100.0f, 60.0f, 40.0f));
-	//osg::Material* pMat = new osg::Material();
-	//pMat->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.3f, 0.3f, 0.1f, 1.0f));
-	//pMat->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(0.8f, 0.8f, 0.3f, 1.0f));
-	//pMat->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(1.0f, 1.0f, 0.6f, 1.0f));
-
-	//pGroup->addChild(pGB);
-	//pGB->addDrawable(pGeomB);
-
-	//pGB->getOrCreateStateSet()->setAttribute(pMat, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
-	//pGB->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE), osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
-
-	//return pGroup;
 }
-
 osg::AnimationPath* createAnimationPath(raaAnimationPointFinders apfs, osg::Group* pRoadGroup)
 {
 	float fAnimTime = 0.0f;
@@ -492,229 +234,283 @@ void buildRoad(osg::Group* pRoadGroup)
 	addRoadTile("roadCurve", "tile28", 4, 4, -180.0f, pRoadGroup);
 }
 
-void createCarOne(osg::Group* pRoadGroup, osg::Group* pCarGroup)
+void initAnimationPoints(osg::Group* pRoadGroup)
 {
-	raaAnimationPointFinders apfs;
-	osg::AnimationPath* ap = new osg::AnimationPath();
+	{
+		raaAnimationPointFinders apfs;
+		apfs.push_back(raaAnimationPointFinder("tile0", 4, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile0", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile1", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile1", 3, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile1", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile1", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile2", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile2", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile2", 5, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile2", 3, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile2", 4, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile2", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile3", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile3", 3, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile3", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile3", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 7, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile4", 5, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile4", 6, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile4", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile5", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile5", 0, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile5", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile5", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 2, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile6", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile12", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile12", 3, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile12", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile12", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 4, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile11", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile11", 3, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile11", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile13", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile13", 0, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile13", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile13", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 6, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile14", 5, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile14", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile15", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile15", 0, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile15", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile15", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 7, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile16", 5, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile16", 6, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile16", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile17", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile17", 3, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile17", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile17", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 11, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 12, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 4, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile6", 11, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 12, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile7", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile7", 0, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile7", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile7", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 4, pRoadGroup));
+		lstAnimPointFinders.push_back(apfs);
+	}
+	{
+		raaAnimationPointFinders apfs;
+		apfs.push_back(raaAnimationPointFinder("tile20", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile20", 0, pRoadGroup));
 
-	apfs.push_back(raaAnimationPointFinder("tile0", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile0", 3, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile0", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 7, pRoadGroup));
 
+		apfs.push_back(raaAnimationPointFinder("tile18", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile18", 3, pRoadGroup));
 
-	ap = createAnimationPath(apfs, pRoadGroup);
+		apfs.push_back(raaAnimationPointFinder("tile16", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 2, pRoadGroup));
 
-	// NOTE: you will need to extend or develop the car facarde to manage the animmation speed and events
-	raaCarFacarde* pCar = new raaCarFacarde(g_pRoot, raaAssetLibrary::getNamedAsset("vehicle", "car1"), ap, 30.0);
-	pCarGroup->addChild(pCar->root());
+		apfs.push_back(raaAnimationPointFinder("tile15", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile15", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile14", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile13", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile13", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile11", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 7, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile12", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile12", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile6", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 7, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile5", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile5", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile4", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile3", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile3", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile2", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile2", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile2", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile1", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile1", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile0", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile20", 2, pRoadGroup));
+		lstAnimPointFinders.push_back(apfs);
+	}
+	{
+		raaAnimationPointFinders apfs;
+		apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile26", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile26", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile28", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile27", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile27", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile14", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 7, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile15", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile15", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile16", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 7, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile17", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile17", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile6", 11, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 12, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 4, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile7", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile7", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile0", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile20", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile20", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile19", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile21", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile21", 0, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile22", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile22", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile22", 2, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile23", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile23", 3, pRoadGroup));
+
+		apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
+		lstAnimPointFinders.push_back(apfs);
+	}
+	{
+		raaAnimationPointFinders apfs;
+		apfs.push_back(raaAnimationPointFinder("tile19", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile16", 10, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile24", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile24", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 15, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 8, pRoadGroup));
+		lstAnimPointFinders.push_back(apfs);
+	}
+	{
+		raaAnimationPointFinders apfs;
+		apfs.push_back(raaAnimationPointFinder("tile8", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile8", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile9", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile9", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile9", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile14", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile19", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 6, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile0", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 3, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile4", 4, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile8", 1, pRoadGroup));
+		lstAnimPointFinders.push_back(apfs);
+	}
+	{
+		raaAnimationPointFinders apfs;
+		apfs.push_back(raaAnimationPointFinder("tile12", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile12", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 5, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 14, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile6", 10, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile24", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile24", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 0, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 1, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile28", 2, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 8, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 9, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile11", 7, pRoadGroup));
+		apfs.push_back(raaAnimationPointFinder("tile12", 2, pRoadGroup));
+		lstAnimPointFinders.push_back(apfs);
+	}
 }
 
-void createCarTwo(osg::Group* pRoadGroup, osg::Group* pCarGroup) {
-	raaAnimationPointFinders apfs;
-	osg::AnimationPath* ap = new osg::AnimationPath();
-
-	apfs.push_back(raaAnimationPointFinder("tile20", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile20", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile19", 8, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile19", 9, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile19", 7, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile18", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile18", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile16", 8, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile16", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile15", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile15", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile14", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile14", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile14", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile13", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile13", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile11", 8, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile11", 9, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile11", 7, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile12", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile12", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile6", 5, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 6, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 7, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile5", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile5", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile4", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile4", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile4", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile3", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile3", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile2", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile2", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile2", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile1", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile1", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile0", 8, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile0", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile20", 2, pRoadGroup));
-	ap = createAnimationPath(apfs, pRoadGroup);
-
-	raaCarFacarde* pCar = new raaCarFacarde(g_pRoot, raaAssetLibrary::getNamedAsset("vehicle", "car2"), ap, 30.0);
-	pCarGroup->addChild(pCar->root());
-}
-
-void createCarThree(osg::Group* pRoadGroup, osg::Group* pCarGroup) {
-	raaAnimationPointFinders apfs;
-	osg::AnimationPath* ap = new osg::AnimationPath();
-
-	apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile26", 3, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile26", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile28", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile28", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile28", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile27", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile27", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile14", 8, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile14", 9, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile14", 7, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile15", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile15", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile16", 5, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile16", 6, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile16", 7, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile17", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile17", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile6", 11, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 12, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile6", 4, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile7", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile7", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile0", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile0", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile0", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile20", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile20", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile19", 8, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile19", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile21", 2, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile21", 0, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile22", 0, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile22", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile22", 2, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile23", 1, pRoadGroup));
-	apfs.push_back(raaAnimationPointFinder("tile23", 3, pRoadGroup));
-
-	apfs.push_back(raaAnimationPointFinder("tile24", 2, pRoadGroup));
-
-
-
-
-	ap = createAnimationPath(apfs, pRoadGroup);
-
-	raaCarFacarde* pCar = new raaCarFacarde(g_pRoot, raaAssetLibrary::getNamedAsset("vehicle", "car3"), ap, 30.0);
-	pCarGroup->addChild(pCar->root());
-}
-
-void createTrafficLights(osg::Group* pRoadGroup, osg::Group* pTrafficLightGroup)
+void createCar(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 {
+	std::set<int> lstIndexs;
+	while (lstIndexs.size() < 3)
+	{
+		int nIndex = rand() % 6;
+		if (lstIndexs.find(nIndex) != lstIndexs.end())
+			continue;
 
-	addLightsTile("roadStraight", "tile20", 1, 0, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile17", 1, 2, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile13", 1, 4, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile5", -1, 2, 0.0f, pRoadGroup, pTrafficLightGroup);
-	//addLightsTile("roadStraight", "tile25", 3, 2, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile12", 0, 3, -90.0f, pRoadGroup, pTrafficLightGroup);
-	//addLightsTile("roadStraight", "tile15", 2, 3, -90.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile7", 0, 1, -90.0f, pRoadGroup, pTrafficLightGroup);
-	//addLightsTile("roadStraight", "tile18",2, 1, -90.0f, pRoadGroup, pTrafficLightGroup);
-	//addLightsTile("roadStraight", "tile21", 3, 0, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile1", -1, 0, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile10", -1, 4, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile3", -2, 1, -90.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile8", -2, 3, -90.0f, pRoadGroup, pTrafficLightGroup);
-	// user-controlled traffic lights
-	addLightsTile("roadStraight", "tile21", 3, 0, 0.0f, pRoadGroup, pTrafficLightGroup);
-	addLightsTile("roadStraight", "tile26", 4, 3, -90.0f, pRoadGroup, pTrafficLightGroup);
+		lstIndexs.insert(nIndex);
+	}
+
+	int nIndex = 1;
+	for (std::set<int>::iterator iter = lstIndexs.begin(); iter != lstIndexs.end(); ++iter)
+	{
+		osg::AnimationPath* ap = new osg::AnimationPath();
+		ap = createAnimationPath(lstAnimPointFinders[*iter], pRoadGroup);
+
+		raaCarFacarde* pCar = new raaCarFacarde(g_pRoot, raaAssetLibrary::getNamedAsset("vehicle", "car" + std::to_string(nIndex)), ap, 30.0);
+		pCarGroup->addChild(pCar->root());
+		++nIndex;
+
+		osg::AnimationPath* ap2 = new osg::AnimationPath();
+		ap2 = createAnimationPath(lstAnimPointFinders[*iter], pRoadGroup);
+		raaCarFacarde* pCar2 = new raaCarFacarde(g_pRoot, raaAssetLibrary::getNamedAsset("vehicle", "car" + std::to_string(nIndex)), ap, 30.0);
+		pCarGroup->addChild(pCar2->root());
+		pCar2->setAnimationTime(25);
+		++nIndex;
+	}
 }
 
 osg::ref_ptr<osg::Group> create2DText(const std::string& fontFile, const std::string& textString,
@@ -979,6 +775,101 @@ osg::ref_ptr<osg::Geode> createText(const std::string& text, const osg::Vec4& co
 	return geode;
 }
 
+void initFacardeStruct(osg::Group* pGroup)
+{
+	osg::MatrixTransform* pTranslation = new osg::MatrixTransform();
+	pTranslation->setName("Translation");
+	osg::MatrixTransform* pRotation = new osg::MatrixTransform();
+	pRotation->setName("Rotation");
+	osg::MatrixTransform* pScale = new osg::MatrixTransform();
+	pScale->setName("Scale");
+	pTranslation->addChild(pRotation);
+	pRotation->addChild(pScale);
+	pGroup->addChild(pTranslation);
+}
+
+void addXJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, float fRot, osg::Group* pParent, int& nIndex)
+{
+	osg::Group* pTrafficLightTile = new osg::Group();
+	pTrafficLightTile->setName(sJunctionName);
+	initFacardeStruct(pTrafficLightTile);
+	pParent->addChild(pTrafficLightTile);
+	TrafficLightControl* pLightControl = new TrafficLightControl(pTrafficLightTile, osg::Vec3(g_fTileSize * xUnit, g_fTileSize * yUnit, 0.0f), fRot, 1);
+
+	TrafficLightFacarde* pTrafficLight1 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(-180, 180, 0.0f), -90, 0.08f);
+	pLightControl->scale()->addChild(pTrafficLight1->root());
+	pTrafficLight1->setRedTrafficLight();
+	pTrafficLight1->m_iTrafficLightIndex = 1;
+	pLightControl->addTrafficLight(pTrafficLight1);
+	++nIndex;
+
+	TrafficLightFacarde* pTrafficLight2 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(180.0f, 180.0f, 0.0f), 180.0f, 0.08f);
+	pLightControl->scale()->addChild(pTrafficLight2->root());
+	pTrafficLight2->setGreenTrafficLight();
+	pTrafficLight2->m_iTrafficLightIndex = 2;
+	pLightControl->addTrafficLight(pTrafficLight2);
+	++nIndex;
+
+	TrafficLightFacarde* pTrafficLight3 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(180.0f, -180.0f, 0.0f), 90.0f, 0.08f);
+	pLightControl->scale()->addChild(pTrafficLight3->root());
+	pTrafficLight3->setRedTrafficLight();
+	pTrafficLight3->m_iTrafficLightIndex = 3;
+	pLightControl->addTrafficLight(pTrafficLight3);
+	++nIndex;
+
+
+	TrafficLightFacarde* pTrafficLight4 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(-180.0f, -180.0f, 0.0f), 0.0f, 0.08f);
+	pLightControl->scale()->addChild(pTrafficLight4->root());
+	pTrafficLight4->setGreenTrafficLight();
+	pTrafficLight4->m_iTrafficLightIndex = 4;
+	pLightControl->addTrafficLight(pTrafficLight4);
+	++nIndex;
+}
+void addTJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, float fRot, osg::Group* pParent, int& nIndex)
+{
+	osg::Group* pTrafficLightTile = new osg::Group();
+	pTrafficLightTile->setName(sJunctionName);
+	initFacardeStruct(pTrafficLightTile);
+	pParent->addChild(pTrafficLightTile);
+	TrafficLightControl* pLightControl = new TrafficLightControl(pTrafficLightTile, osg::Vec3(g_fTileSize * xUnit, g_fTileSize * yUnit, 0.0f), fRot, 1);
+
+	TrafficLightFacarde* pTrafficLight1 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(-180.0f, -180.0f, 0.0f), 0.0f, 0.08f);
+	pTrafficLight1->setGreenTrafficLight();
+	pLightControl->scale()->addChild(pTrafficLight1->root());
+	pLightControl->addTrafficLight(pTrafficLight1);
+	pTrafficLight1->m_iTrafficLightIndex = 1;
+	++nIndex;
+
+	TrafficLightFacarde* pTrafficLight2 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(-180, 180, 0.0f), -90, 0.08f);
+	pTrafficLight2->setRedTrafficLight();
+	pLightControl->scale()->addChild(pTrafficLight2->root());
+	pLightControl->addTrafficLight(pTrafficLight2);
+	pTrafficLight2->m_iTrafficLightIndex = 2;
+	++nIndex;
+
+	TrafficLightFacarde* pTrafficLight3 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(180.0f, 180.0f, 0.0f), 180.0f, 0.08f);
+	pTrafficLight3->setGreenTrafficLight();
+	pLightControl->scale()->addChild(pTrafficLight3->root());
+	pLightControl->addTrafficLight(pTrafficLight3);
+	pTrafficLight3->m_iTrafficLightIndex = 3;
+	++nIndex;
+}
+
+void createTrafficLightGroup()
+{
+	int nIndex = 1;
+	osg::Group* pTrafficLightGroup = new osg::Group();
+	g_pRoot->addChild(pTrafficLightGroup);
+	addXJunctionTrafficLight("XJunction1Light", 2, 2, 0.0f, pTrafficLightGroup, nIndex);
+	addXJunctionTrafficLight("XJunction2Light", 0, 2, 0.0f, pTrafficLightGroup, nIndex);
+	addTJunctionTrafficLight("TJunction1Light", 0, 0, -90.0f, pTrafficLightGroup, nIndex);
+	addTJunctionTrafficLight("TJunction2Light", 2, 0, -90.0f, pTrafficLightGroup, nIndex);
+	addTJunctionTrafficLight("TJunction3Light", 0, 4, 90.0f, pTrafficLightGroup, nIndex);
+	addTJunctionTrafficLight("TJunction4Light", 2, 4, 90.0f, pTrafficLightGroup, nIndex);
+	addTJunctionTrafficLight("TJunction5Light", -2, 2, 180.0f, pTrafficLightGroup, nIndex);
+	addTJunctionTrafficLight("TJunction6Light", 4, 2, 0.0f, pTrafficLightGroup, nIndex);
+}
+
 //osg::Node* loadModel(const std::string& filename)
 //{
 //	// Load the model
@@ -1008,60 +899,33 @@ osg::ref_ptr<osg::Geode> createText(const std::string& text, const osg::Vec4& co
 //	return scaleTransform;
 //}
 
-// class to click on 3D nodes (bugs)
-class PickingHandler2 : public osgGA::GUIEventHandler {
+class VehicleFollowingCommand : public CommandBase
+{
 public:
-	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+	VehicleFollowingCommand(MenuButton* pMenu)
 	{
-		if (ea.getEventType() == osgGA::GUIEventAdapter::RELEASE && ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON)
+		m_pMenu = pMenu;
+	}
+	bool operator()()
+	{
+		if (!m_pMenu)
+			return false;
+
+		if (m_pMenu->getLabel().compare("Enable Follow") == 0)
 		{
-			// Get the mouse click position
-			float x = ea.getX();
-			float y = ea.getY();
-
-			// Create a new intersector for the camera
-			osgUtil::LineSegmentIntersector* intersector = new osgUtil::LineSegmentIntersector(osgUtil::Intersector::WINDOW, x, y);
-			osgUtil::IntersectionVisitor iv(intersector);
-
-			// Traverse the scene graph and compute the intersections
-			aa.asView()->getCamera()->accept(iv);
-			if (intersector->containsIntersections())
-			{
-				// Get the first intersection from the list
-				osgUtil::LineSegmentIntersector::Intersection intersection = *(intersector->getIntersections().begin());
-				osg::NodePath nodePath = intersection.nodePath;
-
-				// Print the node name
-				for (int i = 0; i < nodePath.size(); ++i)
-				{
-					raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(nodePath[i]->getUpdateCallback());
-					if (!pCarFacarde || !pCarFacarde->root())
-						continue;
-
-					std::string nodeName = nodePath[i + 1]->getName();
-					std::cout << "Clicked on node: " << nodeName << std::endl;
-					if (nodeName.compare("car1") == 0)
-					{
-						mTrackCar = pCarFacarde;
-						mCameraChange = true;
-					}
-					else if (nodeName.compare("car2") == 0)
-					{
-
-					}
-					else if (nodeName.compare("car3") == 0)
-					{
-
-					}
-				}
-			}
+			m_pMenu->setLabel("Disable Follow");
+			PickingHandler::instance()->setAllowClick(false);
 		}
-		return false;
+		else
+		{
+			m_pMenu->setLabel("Enable Follow");
+			PickingHandler::instance()->setAllowClick(true);
+		}
+		return true;
 	}
 
 protected:
-	raaCarFacarde* mTrackCar = nullptr;
-	bool mCameraChange = false;
+	MenuButton* m_pMenu;
 };
 
 int main(int argc, char** argv)
@@ -1111,19 +975,20 @@ int main(int argc, char** argv)
 		640.0f,
 		480.0f,
 		MASK_2D,
-		osgWidget::WindowManager::WM_PICK_DEBUG
+		osgWidget::WindowManager::WM_USE_RENDERBINS
 	);
 
 	osgWidget::Window* menu = new osgWidget::Box("menu", osgWidget::Box::HORIZONTAL);
 
-	menu->addWidget(new CarControlButton("car1"));
-	menu->addWidget(new CarControlButton("car2"));
-	menu->addWidget(new CarControlButton("car3"));
+	MenuButton* pVehicleFollowMenu = new MenuButton("Enable Follow", 1);
+	menu->addWidget(pVehicleFollowMenu);
+	ButtonCommandSet::instance()->addCommand(1, new VehicleFollowingCommand(pVehicleFollowMenu));
 
 	wm->addChild(menu);
 
 	menu->getBackground()->setColor(1.0f, 1.0f, 1.0f, 0.0f);
 	menu->resizePercent(100.0f);
+
 
 	// Create a group for the text
 	// osg::ref_ptr<osg::Group> textGroup = create2DText("arial.ttf", "Hello, world!", 20.0f, osg::Vec3(50, 50, 0));
@@ -1135,10 +1000,7 @@ int main(int argc, char** argv)
 	g_pRoot->addChild(pRoadGroup);
 
 	// Traffic Lights
-	osg::Group* pTrafficLightGroup = new osg::Group();
-	pTrafficLightGroup->setName("Traffic Lights Group");
-	g_pRoot->addChild(pTrafficLightGroup);
-	createTrafficLights(pRoadGroup, pTrafficLightGroup);
+	createTrafficLightGroup();
 
 	// Add a group node to the scene to hold the cars sub-tree
 	osg::Group* pCarGroup = new osg::Group();
@@ -1148,14 +1010,9 @@ int main(int argc, char** argv)
 	// Create road
 	buildRoad(pRoadGroup);
 
-	// Add car one
-	createCarOne(pRoadGroup, pCarGroup);
+	initAnimationPoints(pRoadGroup);
 
-	// Add car two
-	createCarTwo(pRoadGroup, pCarGroup);
-
-	// Add car three
-	createCarThree(pRoadGroup, pCarGroup);
+	createCar(pRoadGroup, pCarGroup);
 
 	// osg setup stuff
 	osg::GraphicsContext::Traits* pTraits = new osg::GraphicsContext::Traits();
@@ -1206,7 +1063,7 @@ int main(int argc, char** argv)
 	viewer.addEventHandler(new osgViewer::ScreenCaptureHandler);
 
 	// add the clicking on 3D nodes
-	viewer.addEventHandler(new PickingHandler);
+	viewer.addEventHandler(PickingHandler::instance());
 
 	// set the scene to render
 	//viewer.setSceneData(g_pRoot);

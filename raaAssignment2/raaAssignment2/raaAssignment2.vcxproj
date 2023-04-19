@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonCommandSet.cpp" />
+    <ClCompile Include="MenuButton.cpp" />
     <ClCompile Include="PickingHandler.cpp" />
     <ClCompile Include="raaAnimatedFacarde.cpp" />
     <ClCompile Include="raaAnimationPathCallback.cpp" />
@@ -167,6 +169,8 @@
     <ClCompile Include="TrafficLightFacarde.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonCommandSet.h" />
+    <ClInclude Include="MenuButton.h" />
     <ClInclude Include="PickingHandler.h" />
     <ClInclude Include="raaAnimatedFacarde.h" />
     <ClInclude Include="raaAnimationPathCallback.h" />

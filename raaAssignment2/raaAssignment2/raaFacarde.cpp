@@ -1,4 +1,4 @@
-
+﻿
 #include <windows.h>
 #include <osg/Billboard>
 #include <osgText/Text>
@@ -68,6 +68,11 @@ osg::MatrixTransform* raaFacarde::rotation()
 	return m_pRotation;
 }
 
+osg::MatrixTransform* raaFacarde::scale()
+{
+	return m_pScale;
+}
+
 osg::Node* raaFacarde::root()
 {
 	return m_pRoot;
@@ -75,7 +80,7 @@ osg::Node* raaFacarde::root()
 
 void raaFacarde::showName(bool bShow)
 {
-	if(m_pNameSwitch)
+	if (m_pNameSwitch)
 	{
 		if (bShow) m_pNameSwitch->setAllChildrenOn();
 		else m_pNameSwitch->setAllChildrenOff();

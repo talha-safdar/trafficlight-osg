@@ -12,11 +12,20 @@
 
 PickingHandler::PickingHandler()
 {
-
+	m_bAllowClick = true;
+	m_bUpdateUI = true;
 }
 PickingHandler::~PickingHandler()
 {
 
+}
+
+PickingHandler* PickingHandler::instance()
+{
+	static osg::ref_ptr<PickingHandler> s_ptrPickingHandler;
+	if (!s_ptrPickingHandler)
+		s_ptrPickingHandler = new PickingHandler();
+	return s_ptrPickingHandler;
 }
 
 bool PickingHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
@@ -45,7 +54,13 @@ bool PickingHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
 
 bool PickingHandler::handleFrame(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
-	if (!mCameraChange || !mCarFacarde)
+	if (m_bUpdateUI)
+	{
+		updateUI(dynamic_cast<osgViewer::View*>(&aa));
+		m_bUpdateUI = false;
+	}
+
+	if (!m_bCameraChange || !m_pCarFacarde)
 		return false;
 
 	osgViewer::View* pView = dynamic_cast<osgViewer::View*>(&aa);
@@ -56,9 +71,9 @@ bool PickingHandler::handleFrame(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 	if (!pSwitchSceneManipulator)
 		return false;
 
-	raaBoundCalculator* bounds = new raaBoundCalculator(mCarFacarde->root());
-	osg::Vec3 vNewEye = (bounds->centre() + osg::Vec3(50, 0, 20)) * mCarFacarde->translation()->getWorldMatrices()[0];
-	osg::Vec3 vNewCenter = (bounds->centre() + osg::Vec3(100, 0, 20)) * mCarFacarde->translation()->getWorldMatrices()[0];
+	raaBoundCalculator* bounds = new raaBoundCalculator(m_pCarFacarde->root());
+	osg::Vec3 vNewEye = (bounds->centre() + osg::Vec3(50, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
+	osg::Vec3 vNewCenter = (bounds->centre() + osg::Vec3(100, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
 
 	osg::Vec3 vNewUp = osg::Z_AXIS;
 	pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(vNewEye, vNewCenter, vNewUp));
@@ -67,6 +82,9 @@ bool PickingHandler::handleFrame(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 
 bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
+	if (!m_bAllowClick)
+		return false;
+
 	// Get the mouse click position
 	float x = ea.getX();
 	float y = ea.getY();
@@ -92,7 +110,7 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 
 			std::string nodeName = nodePath[i + 1]->getName();
 			std::cout << "Clicked on node: " << nodeName << std::endl;
-			if (nodeName.compare("car1") == 0 || nodeName.compare("car2") == 0 || nodeName.compare("car3") == 0)
+			if (nodeName.find("car") != std::string::npos)
 			{
 				osgViewer::View* pView = dynamic_cast<osgViewer::View*>(&aa);
 				if (!pView)
@@ -102,10 +120,10 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 				if (!pSwitchSceneManipulator)
 					return false;
 
-				pSwitchSceneManipulator->getInverseMatrix().getLookAt(mOldEye, mOldCenter, mOldUp);
-				mCarFacarde = pCarFacarde;
+				pSwitchSceneManipulator->getInverseMatrix().getLookAt(m_vOldEye, m_vOldCenter, m_vOldUp);
+				m_pCarFacarde = pCarFacarde;
 				pCarFacarde->toggleStatus();
-				mCameraChange = true;
+				m_bCameraChange = true;
 
 				osg::ref_ptr<osg::LightModel> ptrLightModel = new osg::LightModel();
 				ptrLightModel->setAmbientIntensity(osg::Vec4(1.0, 1.0, 1.0, 1.0));
@@ -119,16 +137,20 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 
 bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
-	if (!mCarFacarde)
+	if (ea.getKey() == osgGA::GUIEventAdapter::KEY_X)
+	{
+		m_bAllowClick = !m_bAllowClick;
+		m_bUpdateUI = true;
+	}
+	if (!m_pCarFacarde)
 		return false;
-
 	if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Up)
 	{
-		mCarFacarde->status = 1;
+		m_pCarFacarde->status = 1;
 	}
 	else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Down)
 	{
-		mCarFacarde->status = 2;
+		m_pCarFacarde->status = 2;
 	}
 	else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Z)
 	{
@@ -140,10 +162,50 @@ bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 		if (!pSwitchSceneManipulator)
 			return false;
 
-		pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(mOldEye, mOldCenter, mOldUp));
+		pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(m_vOldEye, m_vOldCenter, m_vOldUp));
 
 		pView->getSceneData()->getOrCreateStateSet()->removeAttribute(osg::StateAttribute::LIGHTMODEL);;
-		mCameraChange = false;
+		m_bCameraChange = false;
 	}
 	return true;
+}
+
+void PickingHandler::setAllowClick(bool bAllow)
+{
+	m_bAllowClick = bAllow;
+	m_bUpdateUI = true;
+}
+
+void PickingHandler::updateUI(osgViewer::View* pView)
+{
+	if (!pView)
+		return;
+
+	osg::Group* pSceneGroup = dynamic_cast<osg::Group*>(pView->getSceneData());
+	if (pSceneGroup)
+	{
+		for (unsigned int i = 0; i < pSceneGroup->getNumChildren(); ++i)
+		{
+			osg::Camera* pCamera = dynamic_cast<osg::Camera*>(pSceneGroup->getChild(i));
+			if (pCamera)
+			{
+				pCamera->setNodeMask(m_bAllowClick ? 0xFFFFFFFF : 0);
+			}
+			else
+			{
+				osg::Group* pRoot = dynamic_cast<osg::Group*>(pSceneGroup->getChild(i));
+				if (pRoot)
+				{
+					for (unsigned int i = 0; i < pRoot->getNumChildren(); ++i)
+					{
+						osg::Camera* pTextCamera = dynamic_cast<osg::Camera*>(pRoot->getChild(i));
+						if (pTextCamera)
+						{
+							pTextCamera->setNodeMask(m_bAllowClick ? 0xFFFFFFFF : 0);
+						}
+					}
+				}
+			}
+		}
+	}
 }

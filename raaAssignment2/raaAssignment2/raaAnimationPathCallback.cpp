@@ -1,4 +1,4 @@
-#include <windows.h>
+﻿#include <windows.h>
 #include <osg/NodeVisitor>
 
 #include "raaAnimationPathCallback.h"
@@ -17,10 +17,16 @@ double raaAnimationPathCallback::getAnimationTime() const
 	return m_dActualTime;
 }
 
+void raaAnimationPathCallback::setAnimationTime(double dTime)
+{
+	m_dActualTime = dTime;
+}
+
+
 void raaAnimationPathCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 {
 	// std::cout << "raaAnimationPathCallback" << std::endl;
-	if(m_bFirst)
+	if (m_bFirst)
 	{
 		m_dLastTime = nv->getFrameStamp()->getSimulationTime();
 		m_bFirst = false;

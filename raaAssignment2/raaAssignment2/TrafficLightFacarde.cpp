@@ -1,8 +1,13 @@
-#include "TrafficLightFacarde.h"
+﻿#include "TrafficLightFacarde.h"
 #include "raaFinder.h"
+
+#include <osg/ComputeBoundsVisitor>
 
 TrafficLightFacarde::TrafficLightFacarde(osg::Node* pPart, osg::Vec3 vTrans, float fRot, float fScale) :raaFacarde(pPart, vTrans, fRot, fScale)
 {
+	m_iTrafficLightIndex = 0;
+	m_nStartTime = osg::Timer::instance()->tick();
+	m_dDuration = 2.0;
 	initLights(pPart);
 }
 
@@ -55,7 +60,8 @@ void TrafficLightFacarde::createMaterial(osg::Vec3f vColour, osg::Material* mat)
 void TrafficLightFacarde::setRedTrafficLight()
 {
 	m_iTrafficLightStatus = 1;
-
+	m_nStartTime = osg::Timer::instance()->tick();
+	m_dDuration = 3.0;
 	m_pRedTrafficLight->getOrCreateStateSet()->setAttribute(m_pRedTrafficLightOnMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 	m_pAmberTrafficLight->getOrCreateStateSet()->setAttribute(m_pAmberTrafficLightOffMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 	m_pGreenTrafficLight->getOrCreateStateSet()->setAttribute(m_pGreenTrafficLightOffMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
@@ -64,7 +70,8 @@ void TrafficLightFacarde::setRedTrafficLight()
 void TrafficLightFacarde::setAmberTrafficLight()
 {
 	m_iTrafficLightStatus = 2;
-
+	m_nStartTime = osg::Timer::instance()->tick();
+	m_dDuration = 0.5;
 	m_pRedTrafficLight->getOrCreateStateSet()->setAttribute(m_pRedTrafficLightOffMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 	m_pAmberTrafficLight->getOrCreateStateSet()->setAttribute(m_pAmberTrafficLightOnMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 	m_pGreenTrafficLight->getOrCreateStateSet()->setAttribute(m_pGreenTrafficLightOffMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
@@ -73,10 +80,38 @@ void TrafficLightFacarde::setAmberTrafficLight()
 void TrafficLightFacarde::setGreenTrafficLight()
 {
 	m_iTrafficLightStatus = 3;
-
+	m_nStartTime = osg::Timer::instance()->tick();
+	m_dDuration = 2.0;
 	m_pRedTrafficLight->getOrCreateStateSet()->setAttribute(m_pRedTrafficLightOffMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 	m_pAmberTrafficLight->getOrCreateStateSet()->setAttribute(m_pAmberTrafficLightOffMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 	m_pGreenTrafficLight->getOrCreateStateSet()->setAttribute(m_pGreenTrafficLightOnMaterial, osg::StateAttribute::ON || osg::StateAttribute::OVERRIDE);
 }
 
+
+bool TrafficLightFacarde::isTimeFinished()
+{
+	if (osg::Timer::instance()->delta_s(m_nStartTime, osg::Timer::instance()->tick()) > m_dDuration)
+		return true;
+
+	return false;
+}
+
+osg::Vec3f TrafficLightFacarde::getWorldDetectionPoint()
+{
+	osg::ComputeBoundsVisitor cbv;
+	scale()->accept(cbv);
+	osg::Vec3 center = cbv.getBoundingBox().center();
+	center.z() = 0;
+	center.y() = center.y() - 50;
+	return center * scale()->getWorldMatrices()[0];
+}
+
+osg::Vec3f TrafficLightFacarde::getWorldCollisionPoint()
+{
+	osg::ComputeBoundsVisitor cbv;
+	scale()->accept(cbv);
+	osg::Vec3 center = cbv.getBoundingBox().center();
+	center.z() = 0;
+	return center * scale()->getWorldMatrices()[0];
+}
 
