@@ -22,6 +22,7 @@ public:
 
 	void setAllowClick(bool bAllow);
 
+	void setFirstPerson(bool bFirst);
 protected:
 	void updateUI(osgViewer::View* pView);
 protected:
@@ -32,5 +33,6 @@ protected:
 	osg::Vec3 m_vOldUp;
 	bool m_bAllowClick = true;
 	bool m_bUpdateUI = false;
+	bool m_bFirstPerson = true;
 };
 

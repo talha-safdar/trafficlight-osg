@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include "raaFacarde.h"
 #include "raaSwitchActivator.h"
 #include "raaAssetLibrary.h"
@@ -16,9 +16,9 @@ pAnimIDS->setName("AnimationIDSwitch");
 bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
 	//osgViewer::Viewer* viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
-	if(ea.getEventType()==osgGA::GUIEventAdapter::KEYDOWN)
+	if (ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
 	{
-		switch(ea.getKey())
+		switch (ea.getKey())
 		{
 		case 't':
 		case 'T':
@@ -29,25 +29,25 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 		{
 			raaSwitchActivator a("AnimationPointSwitch", raaAssetLibrary::getAssetsRoot(), m_bShowAnimationPoints = !m_bShowAnimationPoints);
 		}
-			return true;
+		return true;
 		case 'n':
 		case 'N':
 		{
 			raaSwitchActivator n("AnimationIDSwitch", raaAssetLibrary::getAssetsRoot(), m_bShowAnimationNames = !m_bShowAnimationNames);
 		}
-			return true;
+		return true;
 		case 'i':
 		case 'I':
 		{
 			raaSwitchActivator i("IDSwitch", raaAssetLibrary::getAssetsRoot(), m_bShowAssetName = !m_bShowAssetName);
 		}
-			return true;
+		return true;
 		case 'q':
 		case 'Q':
 		{
 			for (raaFacarde* facarde : raaFacarde::facardes()) {
 				std::string name = facarde->pPart->getName();
-				if (name == "trafficLight14") {
+				if (name == "trafficLight4") {
 					TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
 					if (pTrafficLight->m_iTrafficLightStatus == 1) pTrafficLight->step = 1;
 					else if (pTrafficLight->m_iTrafficLightStatus == 3) pTrafficLight->step = -1;
@@ -71,12 +71,12 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 
 			}
 		}
-			return true;
+		return true;
 		case 'w':
 		case 'W':
 			for (raaFacarde* facarde : raaFacarde::facardes()) {
 				std::string name = facarde->pPart->getName();
-				if (name == "trafficLight15") {
+				if (name == "trafficLight8") {
 					TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
 					if (pTrafficLight->m_iTrafficLightStatus == 1) pTrafficLight->step = 1;
 					else if (pTrafficLight->m_iTrafficLightStatus == 3) pTrafficLight->step = -1;

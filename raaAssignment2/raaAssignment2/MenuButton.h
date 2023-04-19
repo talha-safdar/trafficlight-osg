@@ -23,6 +23,7 @@ public:
 
 	virtual bool mousePush(double, double, const osgWidget::WindowManager*);
 
+	virtual bool mouseLeave(double, double, const osgWidget::WindowManager*);
 protected:
 	int m_nMenuId;
 };

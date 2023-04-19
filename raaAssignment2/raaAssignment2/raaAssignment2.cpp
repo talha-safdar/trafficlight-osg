@@ -36,6 +36,7 @@
 #include "PickingHandler.h"
 #include "MenuButton.h"
 #include "ButtonCommandSet.h"
+#include "raaFinder.h"
 
 // -*-c++-*- osgWidget - Code by: Jeremy Moles (cubicool) 2007-2008
 // $Id: osgwidgetmenu.cpp 66 2008-07-14 21:54:09Z cubicool $
@@ -171,6 +172,7 @@ osg::Node* buildAnimatedVehicleAsset()
 
 	return pGroup;
 }
+
 osg::AnimationPath* createAnimationPath(raaAnimationPointFinders apfs, osg::Group* pRoadGroup)
 {
 	float fAnimTime = 0.0f;
@@ -928,6 +930,62 @@ protected:
 	MenuButton* m_pMenu;
 };
 
+class VehicleControlCommand : public CommandBase
+{
+public:
+	VehicleControlCommand(const std::string& strName)
+	{
+		mstrName = strName;
+	}
+	bool operator()()
+	{
+		raaFinder<osg::Node> car(mstrName, g_pRoot);
+		if (car.node() && car.node()->getNumParents() > 0)
+		{
+			osg::Group* pParent = car.node()->getParent(0);
+			if (pParent)
+			{
+				raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(pParent->getUpdateCallback());
+				if (pCarFacarde)
+					pCarFacarde->setManualStop(!pCarFacarde->getManualStop());
+			}
+		}
+		return true;
+	}
+
+protected:
+	std::string mstrName;
+};
+
+class VehicleDriveCommand : public CommandBase
+{
+public:
+	VehicleDriveCommand(MenuButton* pMenu)
+	{
+		m_pMenu = pMenu;
+	}
+	bool operator()()
+	{
+		if (!m_pMenu)
+			return false;
+
+		if (m_pMenu->getLabel().compare("First Person") == 0)
+		{
+			m_pMenu->setLabel("Third Person");
+			PickingHandler::instance()->setFirstPerson(false);
+		}
+		else
+		{
+			m_pMenu->setLabel("First Person");
+			PickingHandler::instance()->setFirstPerson(true);
+		}
+		return true;
+	}
+
+protected:
+	MenuButton* m_pMenu;
+};
+
 int main(int argc, char** argv)
 {
 	raaAssetLibrary::start();
@@ -954,7 +1012,7 @@ int main(int argc, char** argv)
 	osg::MatrixTransform* g_pWalking = createAnimatedModel();
 	g_pRoot->addChild(g_pWalking);
 
-	osg::Geode* text = createText("Use \"q\" to control the TrafficLight14\nUse \"w\" to control the TrafficLight15", osg::Vec4(1.0, 1.0, 1.0, 1.0), 100, 100);
+	osg::Geode* text = createText("Use \"q\" to control the TrafficLight4\nUse \"w\" to control the TrafficLight8", osg::Vec4(1.0, 1.0, 1.0, 1.0), 100, 100);
 	// g_pRoot->addChild(text);
 
 	// Create and add the model to the root node
@@ -980,9 +1038,23 @@ int main(int argc, char** argv)
 
 	osgWidget::Window* menu = new osgWidget::Box("menu", osgWidget::Box::HORIZONTAL);
 
-	MenuButton* pVehicleFollowMenu = new MenuButton("Enable Follow", 1);
-	menu->addWidget(pVehicleFollowMenu);
-	ButtonCommandSet::instance()->addCommand(1, new VehicleFollowingCommand(pVehicleFollowMenu));
+	menu->addWidget(new MenuButton("car1", 1));
+	menu->addWidget(new MenuButton("car2", 2));
+	menu->addWidget(new MenuButton("car3", 3));
+	menu->addWidget(new MenuButton("car4", 4));
+	menu->addWidget(new MenuButton("car5", 5));
+	menu->addWidget(new MenuButton("car6", 6));
+
+
+	ButtonCommandSet::instance()->addCommand(1, new VehicleControlCommand("car1"));
+	ButtonCommandSet::instance()->addCommand(2, new VehicleControlCommand("car2"));
+	ButtonCommandSet::instance()->addCommand(3, new VehicleControlCommand("car3"));
+	ButtonCommandSet::instance()->addCommand(4, new VehicleControlCommand("car4"));
+	ButtonCommandSet::instance()->addCommand(5, new VehicleControlCommand("car5"));
+	ButtonCommandSet::instance()->addCommand(6, new VehicleControlCommand("car6"));
+	MenuButton* pDriveMenu = new MenuButton("First Person", 7);
+	menu->addWidget(pDriveMenu);
+	ButtonCommandSet::instance()->addCommand(7, new VehicleDriveCommand(pDriveMenu));
 
 	wm->addChild(menu);
 

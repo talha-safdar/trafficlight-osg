@@ -53,10 +53,29 @@ MenuButton::MenuButton(const std::string& label, int nId) :
 
 bool MenuButton::mousePush(double, double, const osgWidget::WindowManager*)
 {
+	if (getColor() == osg::Vec4(buttonClickedColour))
+	{
+		setColor(0.8f, 0.8f, 0.8f, 0.8f); // set color back to original color
+	}
+	// If the button is not orange, set it to orange
+	else
+	{
+		setColor(buttonClickedColour); // set color to orange
+	}
+
 	CommandBase* pCommand = ButtonCommandSet::instance()->getCommandById(m_nMenuId);
 	if (pCommand != nullptr)
 	{
 		(*pCommand)();
+	}
+	return true;
+}
+
+bool MenuButton::mouseLeave(double, double, const osgWidget::WindowManager*)
+{
+	if (getColor() != buttonClickedColour)
+	{
+		setColor(0.3f, 0.3f, 0.3f, 1.0f);
 	}
 	return true;
 }

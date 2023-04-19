@@ -14,6 +14,7 @@ PickingHandler::PickingHandler()
 {
 	m_bAllowClick = true;
 	m_bUpdateUI = true;
+	m_bFirstPerson = true;
 }
 PickingHandler::~PickingHandler()
 {
@@ -71,12 +72,24 @@ bool PickingHandler::handleFrame(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 	if (!pSwitchSceneManipulator)
 		return false;
 
-	raaBoundCalculator* bounds = new raaBoundCalculator(m_pCarFacarde->root());
-	osg::Vec3 vNewEye = (bounds->centre() + osg::Vec3(50, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
-	osg::Vec3 vNewCenter = (bounds->centre() + osg::Vec3(100, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
-
-	osg::Vec3 vNewUp = osg::Z_AXIS;
-	pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(vNewEye, vNewCenter, vNewUp));
+	if (m_bFirstPerson)
+	{
+		raaBoundCalculator* bounds = new raaBoundCalculator(m_pCarFacarde->root());
+		osg::Vec3 vNewEye = (bounds->centre() + osg::Vec3(50, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
+		osg::Vec3 vNewCenter = (bounds->centre() + osg::Vec3(100, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
+		osg::Vec3 vNewUp = osg::Z_AXIS;
+		pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(vNewEye, vNewCenter, vNewUp));
+	}
+	else
+	{
+		osg::Vec3 vCollisionPoint = m_pCarFacarde->getWorldCollisionPoint();
+		osg::Vec3 vDetectionPoint = m_pCarFacarde->getWorldDetectionPoint();
+		osg::Vec3d vNewEye, vNewCenter, vNewUp;
+		vNewEye = vCollisionPoint + (vCollisionPoint - vDetectionPoint) * 1 + osg::Vec3(0, 0, 100);
+		vNewCenter = vDetectionPoint;
+		vNewUp = osg::Z_AXIS;
+		pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(vNewEye, vNewCenter, vNewUp));
+	}
 	return true;
 }
 
@@ -123,6 +136,7 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 				pSwitchSceneManipulator->getInverseMatrix().getLookAt(m_vOldEye, m_vOldCenter, m_vOldUp);
 				m_pCarFacarde = pCarFacarde;
 				pCarFacarde->toggleStatus();
+				pCarFacarde->setManualDriving(true);
 				m_bCameraChange = true;
 
 				osg::ref_ptr<osg::LightModel> ptrLightModel = new osg::LightModel();
@@ -144,13 +158,14 @@ bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 	}
 	if (!m_pCarFacarde)
 		return false;
+
 	if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Up)
 	{
-		m_pCarFacarde->status = 1;
+		m_pCarFacarde->setManualSpeed(1);
 	}
 	else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Down)
 	{
-		m_pCarFacarde->status = 2;
+		m_pCarFacarde->setManualSpeed(2);
 	}
 	else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Z)
 	{
@@ -165,6 +180,7 @@ bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 		pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(m_vOldEye, m_vOldCenter, m_vOldUp));
 
 		pView->getSceneData()->getOrCreateStateSet()->removeAttribute(osg::StateAttribute::LIGHTMODEL);;
+		m_pCarFacarde->setManualDriving(false);
 		m_bCameraChange = false;
 	}
 	return true;
@@ -174,6 +190,11 @@ void PickingHandler::setAllowClick(bool bAllow)
 {
 	m_bAllowClick = bAllow;
 	m_bUpdateUI = true;
+}
+
+void PickingHandler::setFirstPerson(bool bFirst)
+{
+	m_bFirstPerson = bFirst;
 }
 
 void PickingHandler::updateUI(osgViewer::View* pView)

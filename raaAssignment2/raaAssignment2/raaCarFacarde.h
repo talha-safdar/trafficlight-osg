@@ -31,8 +31,15 @@ public:
 	void speedDown();
 	void setSpeed(double dSpeed);
 	double getSpeed();
+	void setManualDriving(bool bAuto);
+	void setManualSpeed(int nStatus);
+	void setManualStop(bool bStop);
+	bool getManualStop();
 	double curSpeed;
 	int status;
 	bool isCollision;
 	bool isCurve;
+	bool bManualDriving;
+	int nManualSpeed;
+	bool bManualStop;
 };

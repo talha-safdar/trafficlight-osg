@@ -34,6 +34,9 @@ raaCarFacarde::raaCarFacarde(osg::Node* pWorldRoot, osg::Node* pPart, osg::Anima
 	this->status = FAST;
 	this->isCollision = FALSE;
 	this->isCurve = FALSE;
+	this->bManualDriving = false;
+	this->nManualSpeed = SPEEDUP;
+	this->bManualStop = false;
 }
 
 raaCarFacarde::~raaCarFacarde()
@@ -65,6 +68,26 @@ double raaCarFacarde::getSpeed()
 	return this->dSpeed;
 }
 
+void raaCarFacarde::setManualDriving(bool bManual)
+{
+	bManualDriving = bManual;
+}
+
+void raaCarFacarde::setManualSpeed(int nStatus)
+{
+	nManualSpeed = nStatus;
+}
+
+void raaCarFacarde::setManualStop(bool bStop)
+{
+	bManualStop = bStop;
+}
+
+bool raaCarFacarde::getManualStop()
+{
+	return bManualStop;
+}
+
 // speed up car
 void raaCarFacarde::speedUp()
 {
@@ -88,59 +111,70 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 	osg::Vec3 carDirection = worldDetectionPoint - worldCollisionPoint;
 	carDirection.normalize();
 	status = SPEEDUP;
-	for (raaFacarde* facarde : sm_lFacardes)
+	if (bManualDriving)
+		status = nManualSpeed;
+
+	if (!bManualStop)
 	{
-		if (facarde == this)
-			continue;
-
-		if (TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde))
+		for (raaFacarde* facarde : sm_lFacardes)
 		{
-			osg::Vec3 lightDetectionPoint = pTrafficLight->getWorldDetectionPoint();
-			osg::Vec3 lightCollisionPoint = pTrafficLight->getWorldCollisionPoint();
-			osg::Vec3 lightDirection = lightCollisionPoint - lightDetectionPoint;
-			lightDirection.normalize();
-
-			// Determine whether the traffic light and direction are consistent with the direction of the vehicle
-			if (!isSameDirection(carDirection, lightDirection))
+			if (facarde == this)
 				continue;
 
-			// Detect the distance between the vehicle and the traffic light, 
-			// if it is less than 130, set the speed according to the color of the traffic light
-			float distance = (worldDetectionPoint - lightCollisionPoint).length();
-			if (distance < 130)
+			if (TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde))
 			{
-				// Stop at red light
-				if (pTrafficLight->m_iTrafficLightStatus == 1)
+				osg::Vec3 lightDetectionPoint = pTrafficLight->getWorldDetectionPoint();
+				osg::Vec3 lightCollisionPoint = pTrafficLight->getWorldCollisionPoint();
+				osg::Vec3 lightDirection = lightCollisionPoint - lightDetectionPoint;
+				lightDirection.normalize();
+
+				// Determine whether the traffic light and direction are consistent with the direction of the vehicle
+				if (!isSameDirection(carDirection, lightDirection))
+					continue;
+
+				// Detect the distance between the vehicle and the traffic light, 
+				// if it is less than 130, set the speed according to the color of the traffic light
+				float distance = (worldDetectionPoint - lightCollisionPoint).length();
+				if (distance < 130)
+				{
+					// Stop at red light
+					if (pTrafficLight->m_iTrafficLightStatus == 1)
+					{
+						status = STOP;
+					}
+					// slow down at yellow light
+					else if (pTrafficLight->m_iTrafficLightStatus == 2)
+					{
+						status = SPEEDDOWN;
+					}
+					// speed up at green light
+					else if (pTrafficLight->m_iTrafficLightStatus == 3)
+					{
+						status = SPEEDUP;
+						if (nManualSpeed)
+							status = nManualSpeed;
+					}
+					break;
+				}
+			}
+
+			if (raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(facarde))
+			{
+				// Calculate the distance between two vehicles, if less than 50, the vehicle stops running
+				osg::Vec3 vPoint = pCarFacarde->getWorldCollisionPoint();
+				float distance = (worldDetectionPoint - vPoint).length();
+				if (distance < 100)
 				{
 					status = STOP;
+					break;
 				}
-				// slow down at yellow light
-				else if (pTrafficLight->m_iTrafficLightStatus == 2)
-				{
-					status = SPEEDDOWN;
-				}
-				// speed up at green light
-				else if (pTrafficLight->m_iTrafficLightStatus == 3)
-				{
-					status = SPEEDUP;
-				}
-				break;
-			}
-		}
-
-		if (raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(facarde))
-		{
-			// Calculate the distance between two vehicles, if less than 50, the vehicle stops running
-			osg::Vec3 vPoint = pCarFacarde->getWorldCollisionPoint();
-			float distance = (worldDetectionPoint - vPoint).length();
-			if (distance < 100)
-			{
-				status = STOP;
-				break;
 			}
 		}
 	}
-
+	else
+	{
+		status = STOP;
+	}
 	if (this->status == SPEEDUP) speedUp();
 	else if (this->status == SPEEDDOWN) speedDown();
 	else if (this->status == FAST) setCurrentSpeed(30);
