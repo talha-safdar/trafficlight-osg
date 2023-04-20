@@ -26,6 +26,7 @@ ButtonCommandSet* ButtonCommandSet::instance()
 	return &bcs;
 }
 
+// Add the command associated with the menu id
 void ButtonCommandSet::addCommand(int nId, CommandBase* pFunc)
 {
 	std::map<int, CommandBase*>::iterator iter = m_mapIdToCommands.find(nId);
@@ -35,6 +36,7 @@ void ButtonCommandSet::addCommand(int nId, CommandBase* pFunc)
 	m_mapIdToCommands.insert(std::pair<int, CommandBase*>(nId, pFunc));
 }
 
+// Get the associated command according to the menu id
 CommandBase* ButtonCommandSet::getCommandById(int nId)
 {
 	std::map<int, CommandBase*>::iterator iter = m_mapIdToCommands.find(nId);

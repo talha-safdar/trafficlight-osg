@@ -157,19 +157,12 @@ osg::Node* buildAnimatedVehicleAsset()
 
 	osg::MatrixTransform* pCarL = new osg::MatrixTransform();
 	osg::Node* pCarN = osgDB::readNodeFile("../models/car-veyron.OSGB");
-
 	raaBoundCalculator* bound = new raaBoundCalculator(pCarN);
-
 	pCarL->preMult(osg::Matrix::scale(10.0f, 10.0f, 10.0f));
-
 	pCarL->preMult(osg::Matrix::rotate(osg::PI_2, osg::Vec3(0.0f, 0.0f, 1.0f)));
-
 	pCarL->postMult(osg::Matrix::translate(osg::Vec3(0.0f, 0.0f, 30.0f)));
-
 	pCarL->addChild(pCarN);
-
 	pGroup->addChild(pCarL);
-
 	return pGroup;
 }
 
@@ -566,7 +559,6 @@ public:
 		: _camera(camera), _startColor(startColor), _endColor(endColor), _duration(duration), _timeElapsed(0.0f), _forward(true)
 	{
 		geodeSunAndMoon = pSunAndMoon;
-		std::cout << "class geodeSunAndMoon: " << geodeSunAndMoon << std::endl;
 	}
 
 	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
@@ -749,7 +741,7 @@ osg::ref_ptr<osg::Geode> createText(const std::string& text, const osg::Vec4& co
 	osg::ref_ptr<osgText::Text> textNode = new osgText::Text;
 	textNode->setText(text);
 	textNode->setColor(color);
-	textNode->setCharacterSize(32);
+	textNode->setCharacterSize(18);
 	textNode->setFont("arial.ttf");
 
 	// Create a geode to hold the text node
@@ -1012,7 +1004,7 @@ int main(int argc, char** argv)
 	osg::MatrixTransform* g_pWalking = createAnimatedModel();
 	g_pRoot->addChild(g_pWalking);
 
-	osg::Geode* text = createText("Use \"q\" to control the TrafficLight4\nUse \"w\" to control the TrafficLight8", osg::Vec4(1.0, 1.0, 1.0, 1.0), 100, 100);
+	osg::Geode* text = createText("Use \"q\" to control the TrafficLight5\nUse \"w\" to control the TrafficLight2\nUse \"x\" to toggle user interaction and 2D elements\nUse the UI buttonts from first to sixth to toggle car movemenet\nClick with cursor on a car to take control\nUse arrow up to accelerate and arrow down to stop\nClick seventth UI button to tggole view mode while in car view mode\nUse \"z\" to exit car view mode", osg::Vec4(1.0, 1.0, 1.0, 1.0), 5, 150);
 	// g_pRoot->addChild(text);
 
 	// Create and add the model to the root node

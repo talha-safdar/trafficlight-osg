@@ -186,12 +186,14 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
 osg::Vec3f raaCarFacarde::getWorldDetectionPoint()
 {
+	// Each collision model has two points, one is the detection point and the other is the collision point
 	raaBoundCalculator bounds(pPart);
 	return (bounds.centre() + osg::Vec3(100, 0, 0)) * root()->getWorldMatrices()[0];
 }
 
 osg::Vec3f raaCarFacarde::getWorldCollisionPoint()
 {
+	// Each collision model has two points, one is the detection point and the other is the collision point
 	raaBoundCalculator bounds(pPart);
 	return (bounds.centre() - osg::Vec3(100, 0, 0)) * root()->getWorldMatrices()[0];
 

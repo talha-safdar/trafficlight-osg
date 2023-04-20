@@ -12,12 +12,11 @@ TrafficLightControl::~TrafficLightControl()
 
 }
 
-int XJunction1_trafficLights[] = { 9, 2, 6, 5 }, TJunction1_trafficLights[] = { 4, 13, 12 }, TJunction2_trafficLights[] = { 8, 10, 1 }, TJunction3_trafficLights[] = { 7, 3, 11 };
-
 void TrafficLightControl::operator() (osg::Node* node, osg::NodeVisitor* nv)
 {
 	for (TrafficLightFacarde* light : m_lTrafficLights)
 	{
+		// Determine whether the current traffic light switches to the next state, if necessary, the traffic light switches to the next dynamic
 		if (light->isTimeFinished())
 			changeTrafficLight(light);
 	}
@@ -26,6 +25,7 @@ void TrafficLightControl::operator() (osg::Node* node, osg::NodeVisitor* nv)
 
 void TrafficLightControl::changeTrafficLight(TrafficLightFacarde* pTrafficLight)
 {
+	// The changing rules of traffic lights are red-yellow-green-yellow
 	if (pTrafficLight->m_iTrafficLightStatus == 1)
 		pTrafficLight->step = 1;
 	else if (pTrafficLight->m_iTrafficLightStatus == 3)

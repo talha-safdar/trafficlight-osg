@@ -98,6 +98,7 @@ bool TrafficLightFacarde::isTimeFinished()
 
 osg::Vec3f TrafficLightFacarde::getWorldDetectionPoint()
 {
+	// Each collision model has two points, one is the detection point and the other is the collision point
 	osg::ComputeBoundsVisitor cbv;
 	scale()->accept(cbv);
 	osg::Vec3 center = cbv.getBoundingBox().center();

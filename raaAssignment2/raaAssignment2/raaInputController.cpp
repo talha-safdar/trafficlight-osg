@@ -47,7 +47,7 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 		{
 			for (raaFacarde* facarde : raaFacarde::facardes()) {
 				std::string name = facarde->pPart->getName();
-				if (name == "trafficLight4") {
+				if (name == "trafficLight5") {
 					TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
 					if (pTrafficLight->m_iTrafficLightStatus == 1) pTrafficLight->step = 1;
 					else if (pTrafficLight->m_iTrafficLightStatus == 3) pTrafficLight->step = -1;
@@ -76,7 +76,7 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 		case 'W':
 			for (raaFacarde* facarde : raaFacarde::facardes()) {
 				std::string name = facarde->pPart->getName();
-				if (name == "trafficLight8") {
+				if (name == "trafficLight2") {
 					TrafficLightFacarde* pTrafficLight = dynamic_cast<TrafficLightFacarde*>(facarde);
 					if (pTrafficLight->m_iTrafficLightStatus == 1) pTrafficLight->step = 1;
 					else if (pTrafficLight->m_iTrafficLightStatus == 3) pTrafficLight->step = -1;

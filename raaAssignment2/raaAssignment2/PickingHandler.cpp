@@ -74,6 +74,7 @@ bool PickingHandler::handleFrame(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 
 	if (m_bFirstPerson)
 	{
+		// If it is first person, calculate the camera's position based on the position of the car.
 		raaBoundCalculator* bounds = new raaBoundCalculator(m_pCarFacarde->root());
 		osg::Vec3 vNewEye = (bounds->centre() + osg::Vec3(50, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
 		osg::Vec3 vNewCenter = (bounds->centre() + osg::Vec3(100, 0, 30)) * m_pCarFacarde->translation()->getWorldMatrices()[0];
@@ -82,6 +83,7 @@ bool PickingHandler::handleFrame(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 	}
 	else
 	{
+		// If it is third person, calculate the camera's position based on the position of the car.
 		osg::Vec3 vCollisionPoint = m_pCarFacarde->getWorldCollisionPoint();
 		osg::Vec3 vDetectionPoint = m_pCarFacarde->getWorldDetectionPoint();
 		osg::Vec3d vNewEye, vNewCenter, vNewUp;
@@ -129,6 +131,7 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 				if (!pView)
 					return false;
 
+				// If you click on the car, switch to the car camera mode, save the current viewpoint and increase the brightness of the environment
 				osgGA::KeySwitchMatrixManipulator* pSwitchSceneManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*>(pView->getCameraManipulator());
 				if (!pSwitchSceneManipulator)
 					return false;
@@ -153,6 +156,7 @@ bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 {
 	if (ea.getKey() == osgGA::GUIEventAdapter::KEY_X)
 	{
+		// Button X controls whether to allow clicking on the car
 		m_bAllowClick = !m_bAllowClick;
 		m_bUpdateUI = true;
 	}
@@ -161,14 +165,17 @@ bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 
 	if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Up)
 	{
+		// press the down arrow key to accelerate
 		m_pCarFacarde->setManualSpeed(1);
 	}
 	else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Down)
 	{
+		// Press the down arrow key to slow down
 		m_pCarFacarde->setManualSpeed(2);
 	}
 	else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Z)
 	{
+		// Press Z to exit the car camera mode and return to the viewpoint when entering the camera mode
 		osgViewer::View* pView = dynamic_cast<osgViewer::View*>(&aa);
 		if (!pView)
 			return false;
@@ -202,6 +209,7 @@ void PickingHandler::updateUI(osgViewer::View* pView)
 	if (!pView)
 		return;
 
+	// Whether it is allowed to switch to the car camera mode, if not allowed, hide the 2D interface, if allowed, show the 2D interface
 	osg::Group* pSceneGroup = dynamic_cast<osg::Group*>(pView->getSceneData());
 	if (pSceneGroup)
 	{

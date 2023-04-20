@@ -53,16 +53,17 @@ MenuButton::MenuButton(const std::string& label, int nId) :
 
 bool MenuButton::mousePush(double, double, const osgWidget::WindowManager*)
 {
+	// When the mouse is clicked, the current menu item color is the click color, then restore to the original color, otherwise switch to the click color
 	if (getColor() == osg::Vec4(buttonClickedColour))
 	{
 		setColor(0.8f, 0.8f, 0.8f, 0.8f); // set color back to original color
 	}
-	// If the button is not orange, set it to orange
 	else
 	{
 		setColor(buttonClickedColour); // set color to orange
 	}
 
+	// Obtain the associated command according to the menu Id and execute it
 	CommandBase* pCommand = ButtonCommandSet::instance()->getCommandById(m_nMenuId);
 	if (pCommand != nullptr)
 	{
@@ -73,6 +74,7 @@ bool MenuButton::mousePush(double, double, const osgWidget::WindowManager*)
 
 bool MenuButton::mouseLeave(double, double, const osgWidget::WindowManager*)
 {
+	// If the menu item is not clicked, the default color will be restored when the mouse is moved out
 	if (getColor() != buttonClickedColour)
 	{
 		setColor(0.3f, 0.3f, 0.3f, 1.0f);
