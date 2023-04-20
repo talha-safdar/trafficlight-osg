@@ -6,7 +6,6 @@
 #include <osg/Shape>
 #include <osg/Material>
 #include <osg/Switch>
-
 #include "raaTrafficSystem.h"
 #include "raaCarFacarde.h"
 #include <iostream>
@@ -54,7 +53,6 @@ void raaCarFacarde::speedDown()
 	else {
 		this->curSpeed = 0;
 		setCurrentSpeed(this->curSpeed);
-		//this->status = STOP;
 	}
 }
 
@@ -98,7 +96,6 @@ void raaCarFacarde::speedUp()
 	else {
 		this->curSpeed = this->dSpeed;
 		setCurrentSpeed(this->curSpeed);
-		//this->status = FAST;
 	}
 }
 

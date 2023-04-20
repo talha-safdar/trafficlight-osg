@@ -4,7 +4,6 @@
 #include <list>
 #include "raaNodeCallbackFacarde.h"
 
-
 typedef std::list<TrafficLightFacarde*> trafficLightList;
 
 class TrafficLightControl : public raaNodeCallbackFacarde
@@ -22,6 +21,3 @@ protected:
 	int timeCount;
 	int activeIndex;
 };
-
-
-

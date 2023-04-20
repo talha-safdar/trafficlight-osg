@@ -7,11 +7,6 @@
 #include "TrafficLightControl.h"
 #include "raaCarFacarde.h"
 #include "raaBoundCalculator.h"
-/*
-pTileIDS->setName("IDSwitch");
-pAnimPointS->setName("AnimationPointSwitch");
-pAnimIDS->setName("AnimationIDSwitch");
-*/
 
 bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
@@ -68,7 +63,6 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 						pTrafficLight->setGreenTrafficLight();
 					}
 				}
-
 			}
 		}
 		return true;
@@ -97,7 +91,6 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 						pTrafficLight->setGreenTrafficLight();
 					}
 				}
-
 			}
 			return true;
 		case '1':
@@ -116,7 +109,6 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 					raaCarFacarde* pCar = dynamic_cast<raaCarFacarde*>(facarde);
 					pCar->toggleStatus();
 				}
-
 			}
 			return true;
 		case '3':
@@ -126,12 +118,9 @@ bool raaInputController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 					raaCarFacarde* pCar = dynamic_cast<raaCarFacarde*>(facarde);
 					pCar->toggleStatus();
 				}
-
 			}
 			return true;
-
 		}
-
 	}
 	return false;
 }

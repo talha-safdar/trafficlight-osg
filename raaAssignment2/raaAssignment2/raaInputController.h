@@ -18,4 +18,3 @@ protected:
 	bool m_bShowAssetName;
 	osg::Node* m_pWorldRoot;
 };
-

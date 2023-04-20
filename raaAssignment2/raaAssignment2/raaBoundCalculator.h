@@ -25,4 +25,3 @@ protected:
 	osg::BoundingBox m_BoundingBox;
 	osg::Geode* m_pTarget;
 };
-

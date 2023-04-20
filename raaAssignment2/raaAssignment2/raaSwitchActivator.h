@@ -15,4 +15,3 @@ protected:
 	bool m_bOn;
 	std::string m_sName;
 };
-

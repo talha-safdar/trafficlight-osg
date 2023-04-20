@@ -2,7 +2,6 @@
 #include <osg/Geode>
 #include <osg/MatrixTransform>
 #include <osg/Billboard>
-
 #include "raaBoundCalculator.h"
 
 raaBoundCalculator::raaBoundCalculator(osg::Node* pNode) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), m_pTarget(0)
@@ -45,8 +44,7 @@ void raaBoundCalculator::apply(osg::Geode& node)
 		for (unsigned int i = 0; i < 8; i++) bbt.expandBy(bb.corner(i) * m_Transform);
 
 		m_BoundingBox.expandBy(bbt);
-	}
-	
+	}	
 	traverse(node);
 }
 

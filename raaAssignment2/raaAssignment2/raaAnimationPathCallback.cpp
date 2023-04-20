@@ -1,6 +1,5 @@
 ﻿#include <windows.h>
 #include <osg/NodeVisitor>
-
 #include "raaAnimationPathCallback.h"
 #include <iostream>
 

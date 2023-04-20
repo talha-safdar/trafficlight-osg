@@ -18,4 +18,3 @@ public:
 protected:
 	static raaRoadTileFacardesStringMap sm_mRoadTiles;
 };
-

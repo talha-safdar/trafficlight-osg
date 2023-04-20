@@ -1,9 +1,9 @@
 #pragma once
+
 #include <algorithm>
 #include <list>
 
 typedef std::list<class raaCollisionTarget*> raaCollisionTargets;
-
 
 class raaTrafficSystem
 {
@@ -16,4 +16,3 @@ public:
 protected:
 	static raaCollisionTargets sm_lColliders;
 };
-

@@ -1,4 +1,3 @@
-
 #include <algorithm>
 #include "raaCollisionTarget.h"
 #include "raaTrafficSystem.h"
@@ -29,4 +28,3 @@ const raaCollisionTargets& raaTrafficSystem::colliders()
 {
 	return sm_lColliders;
 }
-

@@ -2,11 +2,7 @@
 #include <osg/Group>
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
-
-
 #include "raaAssetLibrary.h"
-
-
 
 raaAssetLibrary* raaAssetLibrary::sm_pInstance = 0;
 osg::Group* raaAssetLibrary::sm_pAssetRoot=0;
@@ -110,7 +106,6 @@ bool raaAssetLibrary::insertAsset(std::string sName, osg::Node* pNode)
 
 		if (sm_pInstance->m_Assets[sName])
 		{
-//			sm_pInstance->m_Assets[sName]->setName(sName);
 			sm_pAssetRoot->addChild(sm_pInstance->m_Assets[sName]);
 			return true;
 		}

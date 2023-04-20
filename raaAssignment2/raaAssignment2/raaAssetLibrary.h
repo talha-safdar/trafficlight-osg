@@ -1,4 +1,5 @@
 #pragma once
+
 #include <windows.h>
 #include <map>
 #include <osg/Node>
@@ -31,5 +32,3 @@ private:
 	
 	raaAssetList m_Assets;
 };
-
-

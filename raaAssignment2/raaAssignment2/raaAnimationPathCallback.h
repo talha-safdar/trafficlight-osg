@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <osg/AnimationPath>
 
-// this is a derived version of the osg::AnimationPathCallback. Yoou may wish to use this as it gives control over the speed of the animated playback
+// this is a derived version of the osg::AnimationPathCallback. You may wish to use this as it gives control over the speed of the animated playback
 
 class raaAnimationPathCallback : public osg::AnimationPathCallback
 {
@@ -27,4 +27,3 @@ private:
 	double m_dActualTime;
 	bool m_bFirst;
 };
-

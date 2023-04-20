@@ -57,4 +57,3 @@ trafficLightList TrafficLightControl::getTrafficLights()
 {
 	return m_lTrafficLights;
 }
-

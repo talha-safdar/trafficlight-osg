@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <osg/switch>
 #include <list>
-
 #include "raaAnimatedFacarde.h"
 #include "raaCollisionTarget.h"
 

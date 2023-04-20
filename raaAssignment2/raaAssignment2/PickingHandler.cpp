@@ -1,13 +1,9 @@
 ﻿#include "PickingHandler.h"
 #include "raaCarFacarde.h"
 #include "raaBoundCalculator.h"
-
 #include <osgViewer/View>
-
 #include <osgGA/KeySwitchMatrixManipulator>
-
 #include <iostream>
-
 #include <osg/LightModel>
 
 PickingHandler::PickingHandler()

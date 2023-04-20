@@ -1,13 +1,9 @@
 
 #include <windows.h>
 #include <osg/Switch>
-
 #include "raaRoadTileFacarde.h"
 
-
-
 raaRoadTileFacardesStringMap raaRoadTileFacarde::sm_mRoadTiles;
-
 
 raaRoadTileFacarde::raaRoadTileFacarde(osg::Node* pPart): raaNodeCallbackFacarde(pPart)
 {
@@ -38,4 +34,3 @@ const raaRoadTileFacardesStringMap& raaRoadTileFacarde::roadTiles()
 {
 	return sm_mRoadTiles;
 }
-

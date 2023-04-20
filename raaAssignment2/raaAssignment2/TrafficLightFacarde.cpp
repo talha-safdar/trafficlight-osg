@@ -1,6 +1,5 @@
 ﻿#include "TrafficLightFacarde.h"
 #include "raaFinder.h"
-
 #include <osg/ComputeBoundsVisitor>
 
 TrafficLightFacarde::TrafficLightFacarde(osg::Node* pPart, osg::Vec3 vTrans, float fRot, float fScale) :raaFacarde(pPart, vTrans, fRot, fScale)
@@ -115,4 +114,3 @@ osg::Vec3f TrafficLightFacarde::getWorldCollisionPoint()
 	center.z() = 0;
 	return center * scale()->getWorldMatrices()[0];
 }
-

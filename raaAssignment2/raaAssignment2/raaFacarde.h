@@ -1,4 +1,5 @@
 #pragma once
+
 #include <windows.h>
 #include <osg/MatrixTransform>
 
@@ -38,4 +39,3 @@ protected:
 	static raaFacardes sm_lFacardes;
 	static bool sm_bShowNames;
 };
-

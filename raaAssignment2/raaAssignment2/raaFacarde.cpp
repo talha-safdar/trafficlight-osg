@@ -1,5 +1,4 @@
-﻿
-#include <windows.h>
+﻿#include <windows.h>
 #include <osg/Billboard>
 #include <osgText/Text>
 #include <osg/Switch>
@@ -133,6 +132,5 @@ void raaFacarde::init()
 		if (sm_bShowNames) m_pNameSwitch->setAllChildrenOn();
 		else m_pNameSwitch->setAllChildrenOff();
 	}
-
 	sm_lFacardes.push_back(this);
 }

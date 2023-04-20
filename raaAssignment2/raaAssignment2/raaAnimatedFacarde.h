@@ -9,4 +9,3 @@ public:
 	raaAnimatedFacarde(osg::Node* pPart, osg::AnimationPath* ap, double dMaxSpeed);
 	virtual ~raaAnimatedFacarde();
 };
-

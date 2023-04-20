@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <sstream>
 #include <iostream>
-
 #include <osg/MatrixTransform>
 #include "raaAnimationPointFinder.h"
 #include "raaFinder.h"

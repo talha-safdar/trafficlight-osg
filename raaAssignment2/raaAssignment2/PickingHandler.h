@@ -35,4 +35,3 @@ protected:
 	bool m_bUpdateUI = false;
 	bool m_bFirstPerson = true;
 };
-

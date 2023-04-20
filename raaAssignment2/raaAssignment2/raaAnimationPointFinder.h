@@ -23,4 +23,3 @@ protected:
 	unsigned int m_uiAnimPoint;
 	osg::Node* m_pRoot;
 };
-

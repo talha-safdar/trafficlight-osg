@@ -15,4 +15,3 @@ public:
 	
 	void operator()(osg::Node* node, osg::NodeVisitor* nv) override;
 };
-

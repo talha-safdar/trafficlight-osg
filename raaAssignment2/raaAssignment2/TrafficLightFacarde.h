@@ -38,4 +38,3 @@ protected:
 	osg::Timer_t m_nStartTime;
 	double m_dDuration;
 };
-
