@@ -563,7 +563,6 @@ public:
 
 	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
 	{
-		//std::cout << "geodeSunAndMoon: " << geodeSunAndMoon << std::endl;
 		// Calculate the interpolation factor based on the time elapsed and the total duration
 		float t = _timeElapsed / _duration;
 
@@ -705,6 +704,7 @@ osg::MatrixTransform* createAnimatedModel() {
 	float angle = osg::DegreesToRadians(90.0f);
 	float cosAngle = cos(angle);
 	float sinAngle = sin(angle);
+
 	// define control points
 	osg::AnimationPath::ControlPoint CP0(osg::Vec3(-200.f, 210.f, 1.f), osg::Quat(osg::DegreesToRadians(-180.0f), osg::Vec3(0.f, 0.f, 1.f)));
 	osg::AnimationPath::ControlPoint CP1(osg::Vec3(-200.f, 750.f, 1.f), osg::Quat(osg::DegreesToRadians(-90.0f), osg::Vec3(0.f, 0.f, 1.f)));
@@ -723,7 +723,11 @@ osg::MatrixTransform* createAnimatedModel() {
 	osg::ref_ptr<osg::AnimationPathCallback> APCallback = new osg::AnimationPathCallback(path.get());
 
 	osg::MatrixTransform* mt = new osg::MatrixTransform;
-	mt->addChild(model);
+	osg::Matrixd scalingMatrix;
+	scalingMatrix.makeScale(0.5, 0.5, 0.5); // Set the scale factors
+	osg::ref_ptr<osg::MatrixTransform> scalingTransform = new osg::MatrixTransform(scalingMatrix);
+	scalingTransform->addChild(model);
+	mt->addChild(scalingTransform);
 	g_pRoot->addChild(mt);
 
 	// Update the matrix transform with the animation path
@@ -734,6 +738,7 @@ osg::MatrixTransform* createAnimatedModel() {
 
 	return mt;
 }
+
 
 osg::ref_ptr<osg::Geode> createText(const std::string& text, const osg::Vec4& color, float x, float y)
 {
@@ -864,35 +869,6 @@ void createTrafficLightGroup()
 	addTJunctionTrafficLight("TJunction6Light", 4, 2, 0.0f, pTrafficLightGroup, nIndex);
 }
 
-//osg::Node* loadModel(const std::string& filename)
-//{
-//	// Load the model
-//	osg::Node* model = osgDB::readNodeFile(filename);
-//
-//	// Check if the model loaded successfully
-//	if (!model)
-//	{
-//		std::cout << "Error loading model from file: " << filename << std::endl;
-//		return nullptr;
-//	}
-//
-//	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
-//	texture->setImage(osgDB::readImageFile("../models/boyT.jpg"));
-//
-//	osg::StateSet* state = model->getOrCreateStateSet();
-//	state->setTextureAttributeAndModes(0, texture.get());
-//
-//	// Scale the model to an appropriate size
-//	osg::ComputeBoundsVisitor boundsVisitor;
-//	model->accept(boundsVisitor);
-//	osg::BoundingBox bounds = boundsVisitor.getBoundingBox();
-//	float scaleFactor = 100.0f / bounds.radius();
-//	osg::MatrixTransform* scaleTransform = new osg::MatrixTransform;
-//	scaleTransform->setMatrix(osg::Matrix::scale(scaleFactor, scaleFactor, scaleFactor));
-//	scaleTransform->addChild(model);
-//	return scaleTransform;
-//}
-
 class VehicleFollowingCommand : public CommandBase
 {
 public:
@@ -983,8 +959,6 @@ int main(int argc, char** argv)
 	raaAssetLibrary::start();
 	raaTrafficSystem::start();
 
-	// osgViewer::Viewer viewer;
-
 	for (int i = 0; i < argc; i++)
 	{
 		if (std::string(argv[i]) == "-d") g_sDataPath = argv[++i];
@@ -996,7 +970,6 @@ int main(int argc, char** argv)
 
 	osg::Geode* g_pSun = SunAndMoon(); // call SunAndMoon function
 	g_pRoot->addChild(g_pSun);
-	// std::cout << "main geodeSunAndMoon: " << g_pSun << std::endl;
 
 	osg::MatrixTransform* g_pWall = createEnvironmentStructure();
 	g_pRoot->addChild(g_pWall);
@@ -1005,11 +978,6 @@ int main(int argc, char** argv)
 	g_pRoot->addChild(g_pWalking);
 
 	osg::Geode* text = createText("Use \"q\" to control the TrafficLight5\nUse \"w\" to control the TrafficLight2\nUse \"x\" to toggle user interaction and 2D elements\nUse the UI buttonts from first to sixth to toggle car movemenet\nClick with cursor on a car to take control\nUse arrow up to accelerate and arrow down to stop\nClick seventth UI button to tggole view mode while in car view mode\nUse \"z\" to exit car view mode", osg::Vec4(1.0, 1.0, 1.0, 1.0), 5, 150);
-	// g_pRoot->addChild(text);
-
-	// Create and add the model to the root node
-	// osg::Node* boy = loadModel("../models/boy.obj");
-	// g_pRoot->addChild(boy);
 
    // build asset library - instances or clones of parts can be created from this
 	raaAssetLibrary::loadAsset("roadStraight", g_sDataPath + "roadStraight.osgb");
@@ -1037,7 +1005,6 @@ int main(int argc, char** argv)
 	menu->addWidget(new MenuButton("car5", 5));
 	menu->addWidget(new MenuButton("car6", 6));
 
-
 	ButtonCommandSet::instance()->addCommand(1, new VehicleControlCommand("car1"));
 	ButtonCommandSet::instance()->addCommand(2, new VehicleControlCommand("car2"));
 	ButtonCommandSet::instance()->addCommand(3, new VehicleControlCommand("car3"));
@@ -1052,11 +1019,6 @@ int main(int argc, char** argv)
 
 	menu->getBackground()->setColor(1.0f, 1.0f, 1.0f, 0.0f);
 	menu->resizePercent(100.0f);
-
-
-	// Create a group for the text
-	// osg::ref_ptr<osg::Group> textGroup = create2DText("arial.ttf", "Hello, world!", 20.0f, osg::Vec3(50, 50, 0));
-	// g_pRoot->addChild(textGroup);
 
 	// add a group node to the scene to hold the road sub-tree
 	osg::Group* pRoadGroup = new osg::Group();
@@ -1073,9 +1035,7 @@ int main(int argc, char** argv)
 
 	// Create road
 	buildRoad(pRoadGroup);
-
 	initAnimationPoints(pRoadGroup);
-
 	createCar(pRoadGroup, pCarGroup);
 
 	// osg setup stuff
@@ -1129,37 +1089,11 @@ int main(int argc, char** argv)
 	// add the clicking on 3D nodes
 	viewer.addEventHandler(PickingHandler::instance());
 
-	// set the scene to render
-	//viewer.setSceneData(g_pRoot);
-
-	//viewer.realize();
-	//return osgWidget::createExample(viewer, wm, g_pRoot);
-
-	//return viewer.run();
-
 //	osg::ref_ptr<osg::Node> model = osgDB::readRefNodeFile("../../Data/osgcool.osgt");
 	osg::ref_ptr<osg::Node> model = dynamic_cast<osg::Node*>(g_pRoot);
 
 	model->setNodeMask(MASK_3D);
 
-	// Set the clear color to white
-	// viewer.getCamera()->setClearColor(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	//dayNightSimulation(g_pRoot);
-	//viewer.getCamera()->setClearColor(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	// call the dayNightSimulation function with the viewer
-	std::cout << "starting.." << std::endl;
-	//viewer.realize();
-
-	//// Set up the viewer
-	//viewer.setSceneData(g_pRoot);
-	//viewer.realize();
-
-	//// Run the viewer
-	//while (!viewer.done())
-	//{
-	//	viewer.frame();
-	//}
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("../images/sun.tga");
 	if (!image)
 	{
