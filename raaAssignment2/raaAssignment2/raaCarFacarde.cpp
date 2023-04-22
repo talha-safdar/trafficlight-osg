@@ -111,6 +111,8 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 	if (bManualDriving)
 		status = nManualSpeed;
 
+	// If the car is stopped manually, set the speed of the car to 0,
+	// otherwise detect the impact of traffic lights on the car, if there is no impact, then check whether the car has a collision.
 	if (!bManualStop)
 	{
 		for (raaFacarde* facarde : sm_lFacardes)
@@ -157,7 +159,7 @@ void raaCarFacarde::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
 			if (raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(facarde))
 			{
-				// Calculate the distance between two vehicles, if less than 50, the vehicle stops running
+				// Calculate the distance between two vehicles, if less than 100, the vehicle stops running
 				osg::Vec3 vPoint = pCarFacarde->getWorldCollisionPoint();
 				float distance = (worldDetectionPoint - vPoint).length();
 				if (distance < 100)

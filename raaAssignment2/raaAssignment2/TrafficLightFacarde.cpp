@@ -89,6 +89,7 @@ void TrafficLightFacarde::setGreenTrafficLight()
 
 bool TrafficLightFacarde::isTimeFinished()
 {
+	// Detect whether the duration of the traffic light state meets the state switching requirements
 	if (osg::Timer::instance()->delta_s(m_nStartTime, osg::Timer::instance()->tick()) > m_dDuration)
 		return true;
 

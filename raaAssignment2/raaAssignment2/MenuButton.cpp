@@ -22,6 +22,7 @@ bool ColorLabel::mousePush(double, double, const osgWidget::WindowManager*)
 
 bool ColorLabel::mouseEnter(double, double, const osgWidget::WindowManager*)
 {
+	// When the mouse enters the control area and the background color is not the button click color, change the background color,
 	if (getColor() != buttonClickedColour)
 	{
 		setColor(0.6f, 0.6f, 0.6f, 1.0f);
@@ -31,6 +32,7 @@ bool ColorLabel::mouseEnter(double, double, const osgWidget::WindowManager*)
 
 bool ColorLabel::mouseLeave(double, double, const osgWidget::WindowManager*)
 {
+	// Change the background color when the mouse leaves the control area
 	setColor(0.3f, 0.3f, 0.3f, 1.0f);
 	return true;
 }

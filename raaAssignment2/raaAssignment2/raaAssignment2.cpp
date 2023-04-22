@@ -479,6 +479,7 @@ void initAnimationPoints(osg::Group* pRoadGroup)
 
 void createCar(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 {
+	// Rand select three car driving routes
 	std::set<int> lstIndexs;
 	while (lstIndexs.size() < 3)
 	{
@@ -489,6 +490,7 @@ void createCar(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 		lstIndexs.insert(nIndex);
 	}
 
+	// Each route is to place two cars, where the second car travels 2.5 seconds earlier than the first car
 	int nIndex = 1;
 	for (std::set<int>::iterator iter = lstIndexs.begin(); iter != lstIndexs.end(); ++iter)
 	{
@@ -787,6 +789,7 @@ void initFacardeStruct(osg::Group* pGroup)
 	pGroup->addChild(pTranslation);
 }
 
+// Add traffic light to x junction
 void addXJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, float fRot, osg::Group* pParent, int& nIndex)
 {
 	osg::Group* pTrafficLightTile = new osg::Group();
@@ -795,6 +798,7 @@ void addXJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, f
 	pParent->addChild(pTrafficLightTile);
 	TrafficLightControl* pLightControl = new TrafficLightControl(pTrafficLightTile, osg::Vec3(g_fTileSize * xUnit, g_fTileSize * yUnit, 0.0f), fRot, 1);
 
+	// Each x junction defines 4 traffic lights, of which 1 and 3 are a group, 2 and 4 are a group, and the status of the traffic lights in each group must be consistent.
 	TrafficLightFacarde* pTrafficLight1 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(-180, 180, 0.0f), -90, 0.08f);
 	pLightControl->scale()->addChild(pTrafficLight1->root());
 	pTrafficLight1->setRedTrafficLight();
@@ -824,6 +828,7 @@ void addXJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, f
 	pLightControl->addTrafficLight(pTrafficLight4);
 	++nIndex;
 }
+// Add traffic light to T junction
 void addTJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, float fRot, osg::Group* pParent, int& nIndex)
 {
 	osg::Group* pTrafficLightTile = new osg::Group();
@@ -832,6 +837,7 @@ void addTJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, f
 	pParent->addChild(pTrafficLightTile);
 	TrafficLightControl* pLightControl = new TrafficLightControl(pTrafficLightTile, osg::Vec3(g_fTileSize * xUnit, g_fTileSize * yUnit, 0.0f), fRot, 1);
 
+	// Each T junction defines 3 traffic lights, among which 1 and 3 are a group, and the status of the traffic lights in each group must be consistent.
 	TrafficLightFacarde* pTrafficLight1 = new TrafficLightFacarde(raaAssetLibrary::getClonedAsset("trafficLight", "trafficLight" + std::to_string(nIndex)), osg::Vec3(-180.0f, -180.0f, 0.0f), 0.0f, 0.08f);
 	pTrafficLight1->setGreenTrafficLight();
 	pLightControl->scale()->addChild(pTrafficLight1->root());
@@ -854,6 +860,7 @@ void addTJunctionTrafficLight(std::string sJunctionName, int xUnit, int yUnit, f
 	++nIndex;
 }
 
+// create the traffic lights in the scene
 void createTrafficLightGroup()
 {
 	int nIndex = 1;
@@ -907,12 +914,14 @@ public:
 	}
 	bool operator()()
 	{
+		// Find the car with the specified name from the scene
 		raaFinder<osg::Node> car(mstrName, g_pRoot);
 		if (car.node() && car.node()->getNumParents() > 0)
 		{
 			osg::Group* pParent = car.node()->getParent(0);
 			if (pParent)
 			{
+				// Set whether the car is stopped or running according to the state of the car
 				raaCarFacarde* pCarFacarde = dynamic_cast<raaCarFacarde*>(pParent->getUpdateCallback());
 				if (pCarFacarde)
 					pCarFacarde->setManualStop(!pCarFacarde->getManualStop());
@@ -937,6 +946,7 @@ public:
 		if (!m_pMenu)
 			return false;
 
+		// If the current is the first person, then switch directly to the third person, otherwise switch to the first person
 		if (m_pMenu->getLabel().compare("First Person") == 0)
 		{
 			m_pMenu->setLabel("Third Person");
@@ -979,7 +989,7 @@ int main(int argc, char** argv)
 
 	osg::Geode* text = createText("Use \"q\" to control the TrafficLight5\nUse \"w\" to control the TrafficLight2\nUse \"x\" to toggle user interaction and 2D elements\nUse the UI buttonts from first to sixth to toggle car movemenet\nClick with cursor on a car to take control\nUse arrow up to accelerate and arrow down to stop\nClick seventth UI button to tggole view mode while in car view mode\nUse \"z\" to exit car view mode", osg::Vec4(1.0, 1.0, 1.0, 1.0), 5, 150);
 
-   // build asset library - instances or clones of parts can be created from this
+	// build asset library - instances or clones of parts can be created from this
 	raaAssetLibrary::loadAsset("roadStraight", g_sDataPath + "roadStraight.osgb");
 	raaAssetLibrary::loadAsset("roadCurve", g_sDataPath + "roadCurve.osgb");
 	raaAssetLibrary::loadAsset("roadTJunction", g_sDataPath + "roadTJunction.osgb");
@@ -1089,7 +1099,7 @@ int main(int argc, char** argv)
 	// add the clicking on 3D nodes
 	viewer.addEventHandler(PickingHandler::instance());
 
-//	osg::ref_ptr<osg::Node> model = osgDB::readRefNodeFile("../../Data/osgcool.osgt");
+	//	osg::ref_ptr<osg::Node> model = osgDB::readRefNodeFile("../../Data/osgcool.osgt");
 	osg::ref_ptr<osg::Node> model = dynamic_cast<osg::Node*>(g_pRoot);
 
 	model->setNodeMask(MASK_3D);

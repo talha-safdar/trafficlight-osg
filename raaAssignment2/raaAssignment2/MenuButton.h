@@ -25,6 +25,6 @@ public:
 
 	virtual bool mouseLeave(double, double, const osgWidget::WindowManager*);
 protected:
-	int m_nMenuId;
+	int m_nMenuId;		// The command ID associated with the menu
 };
 

@@ -138,6 +138,7 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 				pCarFacarde->setManualDriving(true);
 				m_bCameraChange = true;
 
+				// Update ambient light to brightest
 				osg::ref_ptr<osg::LightModel> ptrLightModel = new osg::LightModel();
 				ptrLightModel->setAmbientIntensity(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 				pView->getSceneData()->getOrCreateStateSet()->setAttributeAndModes(ptrLightModel);
@@ -182,6 +183,7 @@ bool PickingHandler::handleKeyUp(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 
 		pSwitchSceneManipulator->setByInverseMatrix(osg::Matrix::lookAt(m_vOldEye, m_vOldCenter, m_vOldUp));
 
+		// turn off ambient light
 		pView->getSceneData()->getOrCreateStateSet()->removeAttribute(osg::StateAttribute::LIGHTMODEL);;
 		m_pCarFacarde->setManualDriving(false);
 		m_bCameraChange = false;
@@ -211,6 +213,7 @@ void PickingHandler::updateUI(osgViewer::View* pView)
 	{
 		for (unsigned int i = 0; i < pSceneGroup->getNumChildren(); ++i)
 		{
+			// Set whether the UI interface is displayed according to whether the scene is allowed to be clicked
 			osg::Camera* pCamera = dynamic_cast<osg::Camera*>(pSceneGroup->getChild(i));
 			if (pCamera)
 			{
