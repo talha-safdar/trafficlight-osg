@@ -2,21 +2,17 @@
 
 CommandBase::CommandBase()
 {
-
 }
 
 CommandBase::~CommandBase()
 {
-
 }
 
 ButtonCommandSet::ButtonCommandSet()
 {
-
 }
 ButtonCommandSet::~ButtonCommandSet()
 {
-
 }
 
 // object instance

@@ -14,7 +14,6 @@ PickingHandler::PickingHandler()
 }
 PickingHandler::~PickingHandler()
 {
-
 }
 
 PickingHandler* PickingHandler::instance()

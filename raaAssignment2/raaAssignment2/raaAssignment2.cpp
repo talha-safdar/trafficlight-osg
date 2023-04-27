@@ -37,10 +37,6 @@
 #include "MenuButton.h"
 #include "ButtonCommandSet.h"
 #include "raaFinder.h"
-
-// -*-c++-*- osgWidget - Code by: Jeremy Moles (cubicool) 2007-2008
-// $Id: osgwidgetmenu.cpp 66 2008-07-14 21:54:09Z cubicool $
-
 #include <osgDB/ReadFile>
 #include <osgWidget/Util>
 #include <osgWidget/WindowManager>
@@ -110,11 +106,9 @@ public:
 
 			break;
 		}
-
 		default:
 			break;
 		}
-
 		return false;
 	}
 
@@ -163,6 +157,7 @@ osg::Node* buildAnimatedVehicleAsset()
 	pCarL->postMult(osg::Matrix::translate(osg::Vec3(0.0f, 0.0f, 30.0f)));
 	pCarL->addChild(pCarN);
 	pGroup->addChild(pCarL);
+
 	return pGroup;
 }
 
@@ -192,7 +187,6 @@ osg::AnimationPath* createAnimationPath(raaAnimationPointFinders apfs, osg::Grou
 		ap->insert(fAnimTime, osg::AnimationPath::ControlPoint(apfs[i].translation(), apfs[i].rotation()));
 		fAnimTime += (fDistance / 10.0f);
 	}
-
 	return ap;
 }
 

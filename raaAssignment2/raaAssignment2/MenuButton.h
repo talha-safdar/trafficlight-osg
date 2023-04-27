@@ -27,4 +27,3 @@ public:
 protected:
 	int m_nMenuId;		// The command ID associated with the menu
 };
-

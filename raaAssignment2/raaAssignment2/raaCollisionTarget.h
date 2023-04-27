@@ -9,5 +9,4 @@ class raaCollisionTarget
 public:
 	virtual osg::Vec3f getWorldDetectionPoint()=0;
 	virtual osg::Vec3f getWorldCollisionPoint()=0;
-
 };

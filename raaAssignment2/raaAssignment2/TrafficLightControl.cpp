@@ -9,7 +9,6 @@ TrafficLightControl::TrafficLightControl(osg::Node* pPart, osg::Vec3 vTrans, flo
 
 TrafficLightControl::~TrafficLightControl()
 {
-
 }
 
 void TrafficLightControl::operator() (osg::Node* node, osg::NodeVisitor* nv)

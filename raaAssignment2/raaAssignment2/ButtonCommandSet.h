@@ -30,4 +30,3 @@ public:
 	// command set
 	std::map<int, CommandBase*> m_mapIdToCommands;
 };
-

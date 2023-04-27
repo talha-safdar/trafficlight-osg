@@ -16,5 +16,4 @@ raaAnimatedFacarde::raaAnimatedFacarde(osg::Node* pPart, osg::AnimationPath* ap,
 
 raaAnimatedFacarde::~raaAnimatedFacarde()
 {
-	
 }
