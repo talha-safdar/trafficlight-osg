@@ -981,7 +981,7 @@ int main(int argc, char** argv)
 	osg::MatrixTransform* g_pWalking = createAnimatedModel();
 	g_pRoot->addChild(g_pWalking);
 
-	osg::Geode* text = createText("Use \"q\" to control the TrafficLight5\nUse \"w\" to control the TrafficLight2\nUse \"x\" to toggle user interaction and 2D elements\nUse the UI buttonts from first to sixth to toggle car movemenet\nClick with cursor on a car to take control\nUse arrow up to accelerate and arrow down to stop\nClick seventth UI button to tggole view mode while in car view mode\nUse \"z\" to exit car view mode", osg::Vec4(1.0, 1.0, 1.0, 1.0), 5, 150);
+	osg::Geode* text = createText("Use \"q\" to control the TrafficLight5\nUse \"w\" to control the TrafficLight2\nUse \"x\" to toggle user interaction and 2D elements\nUse the UI buttons from first to sixth to toggle car movements\nClick with cursor on a car to take control\nUse arrow up to accelerate and arrow down to stop\nClick seventh UI button to tggole view mode while in car view mode\nUse \"z\" to exit car view mode", osg::Vec4(1.0, 1.0, 1.0, 1.0), 5, 150);
 
 	// build asset library - instances or clones of parts can be created from this
 	raaAssetLibrary::loadAsset("roadStraight", g_sDataPath + "roadStraight.osgb");
