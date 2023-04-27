@@ -504,8 +504,8 @@ void createCar(osg::Group* pRoadGroup, osg::Group* pCarGroup)
 	}
 }
 
-osg::ref_ptr<osg::Group> create2DText(const std::string& fontFile, const std::string& textString,
-	float characterSize, const osg::Vec3& position) {
+osg::ref_ptr<osg::Group> create2DText(const std::string& fontFile, const std::string& textString, float characterSize, const osg::Vec3& position) 
+{
 	// Create a text node
 	osg::ref_ptr<osgText::Text> text = new osgText::Text;
 
@@ -527,8 +527,8 @@ osg::ref_ptr<osg::Group> create2DText(const std::string& fontFile, const std::st
 	return group;
 }
 
-// sun model 
-osg::Geode* SunAndMoon() {
+// sun-moon model 
+osg::Geode* sunAndMoon() {
 	// std::cout << "sunnning.." << std::endl;
 	osg::Geode* geodeSunAndMoon = new osg::Geode();
 	geodeSunAndMoon->addDrawable(new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(2000.0f, 2500.0f, 1000.0f), 200.0f)));
@@ -689,9 +689,10 @@ osg::MatrixTransform* createEnvironmentStructure()
 	return mtWall;
 }
 
-osg::MatrixTransform* createAnimatedModel() {
+osg::MatrixTransform* createAnimatedModel(const char* model3D) 
+{
 	// Load the model
-	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("../models/boy.obj");
+	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(model3D);
 
 	// Create the animation path
 	osg::ref_ptr<osg::AnimationPath> path = new osg::AnimationPath;
@@ -734,7 +735,6 @@ osg::MatrixTransform* createAnimatedModel() {
 
 	return mt;
 }
-
 
 osg::ref_ptr<osg::Geode> createText(const std::string& text, const osg::Vec4& color, float x, float y)
 {
@@ -870,35 +870,6 @@ void createTrafficLightGroup()
 	addTJunctionTrafficLight("TJunction6Light", 4, 2, 0.0f, pTrafficLightGroup, nIndex);
 }
 
-class VehicleFollowingCommand : public CommandBase
-{
-public:
-	VehicleFollowingCommand(MenuButton* pMenu)
-	{
-		m_pMenu = pMenu;
-	}
-	bool operator()()
-	{
-		if (!m_pMenu)
-			return false;
-
-		if (m_pMenu->getLabel().compare("Enable Follow") == 0)
-		{
-			m_pMenu->setLabel("Disable Follow");
-			PickingHandler::instance()->setAllowClick(false);
-		}
-		else
-		{
-			m_pMenu->setLabel("Enable Follow");
-			PickingHandler::instance()->setAllowClick(true);
-		}
-		return true;
-	}
-
-protected:
-	MenuButton* m_pMenu;
-};
-
 class VehicleControlCommand : public CommandBase
 {
 public:
@@ -972,13 +943,13 @@ int main(int argc, char** argv)
 	g_pRoot = new osg::Group();
 	g_pRoot->ref();
 
-	osg::Geode* g_pSun = SunAndMoon(); // call SunAndMoon function
+	osg::Geode* g_pSun = sunAndMoon(); // call SunAndMoon function
 	g_pRoot->addChild(g_pSun);
 
 	osg::MatrixTransform* g_pWall = createEnvironmentStructure();
 	g_pRoot->addChild(g_pWall);
 
-	osg::MatrixTransform* g_pWalking = createAnimatedModel();
+	osg::MatrixTransform* g_pWalking = createAnimatedModel("../models/boy.obj");
 	g_pRoot->addChild(g_pWalking);
 
 	osg::Geode* text = createText("Use \"q\" to control the TrafficLight5\nUse \"w\" to control the TrafficLight2\nUse \"x\" to toggle user interaction and 2D elements\nUse the UI buttons from first to sixth to toggle car movements\nClick with cursor on a car to take control\nUse arrow up to accelerate and arrow down to stop\nClick seventh UI button to tggole view mode while in car view mode\nUse \"z\" to exit car view mode", osg::Vec4(1.0, 1.0, 1.0, 1.0), 5, 150);

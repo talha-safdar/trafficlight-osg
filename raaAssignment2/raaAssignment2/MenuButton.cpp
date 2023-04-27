@@ -43,10 +43,6 @@ bool ColorLabel::mouseRelease(double, double, const osgWidget::WindowManager*)
 	return true;
 }
 
-
-/// <summary>
-/// ////////////////////////////////////////////////////////////////////////////
-/// </summary>
 MenuButton::MenuButton(const std::string& label, int nId) :
 	ColorLabel(label)
 {

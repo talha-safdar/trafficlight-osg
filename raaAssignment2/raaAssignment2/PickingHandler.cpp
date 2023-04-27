@@ -8,7 +8,7 @@
 
 PickingHandler::PickingHandler()
 {
-	m_bAllowClick = true;
+	m_bAllowClick = true; // to toggle user interaction
 	m_bUpdateUI = true;
 	m_bFirstPerson = true;
 }
@@ -109,7 +109,7 @@ bool PickingHandler::handleLeftMouseRelease(const osgGA::GUIEventAdapter& ea, os
 	{
 		// Get the first intersection from the list
 		osgUtil::LineSegmentIntersector::Intersection intersection = *(intersector->getIntersections().begin());
-		osg::NodePath nodePath = intersection.nodePath;
+		osg::NodePath nodePath = intersection.nodePath; // pass intersected node
 
 		// Print the node name
 		for (int i = 0; i < nodePath.size(); ++i)
@@ -196,6 +196,8 @@ void PickingHandler::setAllowClick(bool bAllow)
 	m_bUpdateUI = true;
 }
 
+// called by "raaAssignment2.cpp" to set either
+// first person or third person.
 void PickingHandler::setFirstPerson(bool bFirst)
 {
 	m_bFirstPerson = bFirst;

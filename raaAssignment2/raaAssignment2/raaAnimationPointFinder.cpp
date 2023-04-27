@@ -71,8 +71,6 @@ int raaAnimationPointFinder::nodePathFinder()
 	}
 }
 
-
-
 osg::Vec3 raaAnimationPointFinder::translation()
 {
 	return osg::computeLocalToWorld(animationPoint()->getParentalNodePaths(m_pRoot)[nodePathFinder()]).getTrans();
